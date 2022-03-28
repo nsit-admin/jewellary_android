@@ -2,24 +2,29 @@ import { Sequelize } from 'sequelize';
 
 import sequelize from '../utils/database.js';
 
-const User = sequelize.define('users', {
-   id: {
+const CustomerCreds = sequelize.define('mobile_customers', {
+   srNo: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       allowNull: false,
       primaryKey: true,
    },
-   email: {
-      type: Sequelize.STRING,
+   mobileNumber: {
+      type: Sequelize.INTEGER,
       allowNull: false,
-   },
-   name: {
-      type: Sequelize.STRING,
    },
    password: {
       type: Sequelize.STRING,
-      allowNull: false,
    },
+   createdDt: {
+      type: Sequelize.STRING, 
+   },
+   updatedDt: {
+      type: Sequelize.STRING,
+   },
+}, {
+   timestamps: false,
+   freezeTableName: true,
 });
 
-export default User;
+export default CustomerCreds;

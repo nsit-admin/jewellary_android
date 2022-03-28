@@ -1,8 +1,13 @@
 import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize('loginDB', 'root', 'YOUR_PASSWORD', {
+const sequelize = new Sequelize('ght', 'ghtadmin', 'Ght54321', {
     dialect: 'mysql',
-    host: 'localhost', 
+    host: 'ght.cskltshvmkbk.ap-south-1.rds.amazonaws.com', 
 });
 
+
+// const sequelize = new Sequelize('ght', 'admin', 'Pabbu123', {
+//     dialect: 'mysql',
+//     host: 'hyperloop.c15ujyuuwji7.ap-south-1.rds.amazonaws.com', 
+// });
 export default sequelize;

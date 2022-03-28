@@ -1,73 +1,254 @@
 import bcrypt from 'bcryptjs';
-
+import e from 'express';
+import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
-import User from '../models/user.js';
+import Chits from '../models/chits.js';
+import ChitRec from '../models/chitsrec.js';
+import CustomerCreds from '../models/customer_creds.js'; 4
+import CustMaster from '../models/custmast.js';
+import sequelize from '../utils/database.js';
 
-const signup = (req, res, next) => {
+
+const signupExisting = (req, res, next) => {
     // checks if email already exists
-    User.findOne({ where : {
-        email: req.body.email, 
-    }})
-    .then(dbUser => {
-        if (dbUser) {
-            return res.status(409).json({message: "email already exists"});
-        } else if (req.body.email && req.body.password) {
-            // password hash
-            bcrypt.hash(req.body.password, 12, (err, passwordHash) => {
-                if (err) {
-                    return res.status(500).json({message: "couldnt hash the password"}); 
-                } else if (passwordHash) {
-                    return User.create(({
-                        email: req.body.email,
-                        name: req.body.name,
-                        password: passwordHash,
-                    }))
-                    .then(() => {
-                        res.status(200).json({message: "user created"});
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.status(502).json({message: "error while creating the user"});
-                    });
-                };
-            });
-        } else if (!req.body.password) {
-            return res.status(400).json({message: "password not provided"});
-        } else if (!req.body.email) {
-            return res.status(400).json({message: "email not provided"});
-        };
+    CustomerCreds.findOne({
+        where: {
+            mobileNumber: req.body.mobileNumber,
+        }
     })
-    .catch(err => {
-        console.log('error', err);
-    });
+        .then(dbUser => {
+            if (dbUser) {
+                return res.status(409).json({ message: "mobile Number " + req.body.mobileNumber + " is already signed up. please login" });
+            } else {
+                Chits.findOne({
+                    where: {
+                        MobileNo: req.body.mobileNumber,
+                    }
+                })
+                    .then(chitUser => {
+                        if (!chitUser) {
+                            return res.status(409).json({ message: "mobile Number " + req.body.mobileNumber + " is not registered with GHT. Please use the right phone number or use new user registration" });
+                        } else {
+                            sequelize.query(`select chtrec.*, max(chtrec.DateStamp) from chits chts, chitrec chtrec where chts.MobileNo = ${req.body.mobileNumber} and chtrec.trno = ${req.body.receiptNo} and chts.TrNo = chtrec.ChitNo group by chtrec.ChitNo`)
+                                .then(chitReceipt => {
+                                    console.log(chitReceipt)
+                                    if (!chitReceipt) {
+                                        return res.status(409).json({ message: "Receipt Number isn't right, you have three more attempts remaingin" });
+                                    } else if (req.body.mobileNumber && req.body.password) {
+                                        // password hash
+                                        bcrypt.hash(req.body.password, 12, (err, passwordHash) => {
+                                            if (err) {
+                                                return res.status(500).json({ message: "couldnt hash the password" });
+                                            } else if (passwordHash) {
+                                                return CustomerCreds.create({
+                                                    mobileNumber: req.body.mobileNumber,
+                                                    password: passwordHash,
+
+                                                })
+                                                    .then(() => {
+                                                        res.status(200).json({ message: "user created for mobile use" });
+                                                    })
+                                                    .catch(err => {
+                                                        console.log(err);
+                                                        res.status(502).json({ message: "error while creating the user" });
+                                                    });
+                                            };
+                                        });
+                                    }
+                                });
+                        }
+                    });
+            }
+        })
+        .catch(err => {
+            console.log('error', err);
+        });
+};
+
+const signupNew = (req, res, next) => {
+    // checks if email already exists
+    CustomerCreds.findOne({
+        where: {
+            mobileNumber: req.body.mobileNumber,
+        }
+    })
+        .then(dbUser => {
+            if (dbUser) {
+                return res.status(409).json({ message: "mobile Number " + req.body.mobileNumber + " is already signed up. please login" });
+            } else {
+                Chits.findOne({
+                    where: {
+                        MobileNo: req.body.mobileNumber,
+                    }
+                })
+                    .then(chitUser => {
+                        if (chitUser) {
+                            return res.status(409).json({ message: "mobile Number " + req.body.mobileNumber + " is registered existing customer with GHT. Please use existing user registration" });
+                        } else {
+                            if (req.body.mobileNumber && req.body.password) {
+                                let response = '';
+                                // password hash
+                                bcrypt.hash(req.body.password, 12, (err, passwordHash) => {
+                                    if (err) {
+                                        return res.status(500).json({ message: "couldnt hash the password" });
+                                    } else if (passwordHash) {
+                                        CustomerCreds.create({
+                                            mobileNumber: req.body.mobileNumber,
+                                            password: passwordHash,
+
+                                        }).then(() => {
+                                            console.log(req.body)
+                                            Chits.create({
+                                                trDate: new Date(),
+                                                yrtrno: 555555,
+                                                CustName: req.body.customerName,
+                                                MobileNo: req.body.mobileNumber,
+                                                Add1: req.body.address1,
+                                                Add2: req.body.address2,
+                                                Add3: req.body.address3,
+                                                Stcode: 1,
+                                                NoI: 12,
+                                                Amt: 0.00,
+                                                wt: 0.000,
+                                            }).then(() => {
+                                                console.log('creating custmast')
+                                                CustMaster.create({
+                                                    CustName: req.body.customerName,
+                                                    MobileNo: req.body.mobileNumber,
+                                                    Add1: req.body.address1,
+                                                    Add2: req.body.address2,
+                                                    Add3: req.body.address3,
+                                                    datestamp: '',
+                                                }).then(() => {
+                                                    response = res.status(200).json({ message: "user created for mobile use" });
+                                                }).catch((err) => {
+                                                    console.log(err)
+                                                })
+                                            }).catch((err) => {
+                                                console.log(err)
+                                            })
+
+                                        })
+                                            .catch(err => {
+                                                console.log(err);
+                                                response = res.status(502).json({ message: "error while creating the user" });
+                                            });
+
+                                        return response;
+                                    };
+                                });
+                            }
+                        }
+                    });
+            }
+        })
+        .catch(err => {
+            console.log('error', err);
+        });
 };
 
 const login = (req, res, next) => {
-    // checks if email exists
-    User.findOne({ where : {
-        email: req.body.email, 
-    }})
-    .then(dbUser => {
-        if (!dbUser) {
-            return res.status(404).json({message: "user not found"});
-        } else {
-            // password hash
-            bcrypt.compare(req.body.password, dbUser.password, (err, compareRes) => {
-                if (err) { // error while comparing
-                    res.status(502).json({message: "error while checking user password"});
-                } else if (compareRes) { // password match
-                    const token = jwt.sign({ email: req.body.email }, 'secret', { expiresIn: '1h' });
-                    res.status(200).json({message: "user logged in", "token": token});
-                } else { // password doesnt match
-                    res.status(401).json({message: "invalid credentials"});
-                };
-            });
-        };
+    // sendSms('9994501928');
+    // checks if mobile number exists
+    CustomerCreds.findOne({
+        where: {
+            mobileNumber: req.body.mobileNumber,
+        }
     })
-    .catch(err => {
-        console.log('error', err);
-    });
+        .then(dbUser => {
+            if (!dbUser) {
+                return res.status(404).json({ message: "user not found" });
+            } else {
+                // password hash
+                bcrypt.compare(req.body.password, dbUser.password, (err, compareRes) => {
+                    if (err) { // error while comparing
+                        res.status(502).json({ message: "error while checking user password", err });
+                    } else if (compareRes) { // password match
+                        const token = jwt.sign({ email: req.body.mobileNumber }, 'secret', { expiresIn: '1h' });
+                        Chits.findAll({
+                            where: {
+                                MobileNo: req.body.mobileNumber
+                            }
+                        }).then((chits) => {
+                            res.status(200).json({ message: "user logged in", chits: chits, "token": token });
+                        })
+                    } else { // password doesnt match
+                        res.status(401).json({ message: "invalid credentials" });
+                    };
+                });
+            };
+        })
+        .catch(err => {
+            console.log('error', err);
+        });
+};
+
+const payment = (req, res, next) => {
+    // sendSms('9994501928');
+    // checks if mobile number exists
+    Chits.findOne({ // THIS WILL BE PAYMENT GATEWAAY CALL
+        where: {
+            MobileNo: req.body.mobileNumber,
+        }
+    })
+        .then(dbUser => {
+            if (!dbUser) {
+                return res.status(404).json({ message: "Gateway Error" });
+            } else {
+                ChitRec.create({
+                    trno: req.body.trno,
+                    yrtrno: req.body.yrtrno,
+                    chitno: req.body.chitno,
+                    trdate: '',
+                    instno: req.body.instno,
+                    rate: '', // TODO - GEt it from other table during insertion
+                    wt: '', // TODO - Calculation to be done
+                    datestamp: new Date()
+
+                }).then((ins) => {
+                    console.log(ins)
+                    return res.status(200).json({ message: `payment completed for the chitNo - ${req.body.chitno}, your receipt number is ` });
+                }).catch((err) => {
+                    console.log(err)
+                })
+            };
+        })
+        .catch(err => {
+            console.log('error', err);
+        });
+};
+
+const schemes = (req, res, next) => {
+    Chits.findAll({
+        where: {
+            MobileNo: req.query.mobileNumber
+        }
+    }).then((chits) => {
+        res.status(200).json({ chits: chits });
+    })
+};
+
+const schemesAddition = (req, res, next) => {
+    Chits.create({
+        trDate: new Date(),
+        trno: 555555,
+        yrtrno: 555555,
+        CustName: req.body.customerName,
+        MobileNo: req.body.mobileNumber,
+        Add1: req.body.address1,
+        Add2: req.body.address2,
+        Add3: req.body.address3,
+        Stcode: 1,
+        NoI: 11,
+        instamt: req.body.instamt,
+        Amt: 0.00,
+        wt: 0.000,
+    }).then((chits) => {
+        res.status(200).json({ chits: chits });
+    }).catch((err) => {
+        console.log(err)
+    })
 };
 
 const isAuth = (req, res, next) => {
@@ -76,7 +257,7 @@ const isAuth = (req, res, next) => {
         return res.status(401).json({ message: 'not authenticated' });
     };
     const token = authHeader.split(' ')[1];
-    let decodedToken; 
+    let decodedToken;
     try {
         decodedToken = jwt.verify(token, 'secret');
     } catch (err) {
@@ -89,4 +270,8 @@ const isAuth = (req, res, next) => {
     };
 };
 
-export { signup, login, isAuth };
+const sendSms = (mobileNumber) => {
+    axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&Message=Thank%20you%20for%20shopping%20%40%20GURU%20HASTI%20THANGA%20MAALIGAI%2C%20POONAMALLEE.%20Please%20Visit%20again%20and%20again%21%20Have%20a%20great%20day%21&MobileNumbers=${mobileNumber}%2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`)
+}
+
+export { signupExisting, signupNew, login, schemes, payment, isAuth, schemesAddition };
