@@ -59,31 +59,31 @@ const AuthScreen = () => {
             },
             body: JSON.stringify(payload),
         })
-        .then(async res => { 
-            try {
-                const jsonRes = await res.json();
-                if (res.status !== 200) {
-                    setIsError(true);
-                    setMessage(jsonRes.message);
-                } else {
-                    if (screenType === 'SignIn') {
-                        navigation.navigate('My Chits', {mobileNumber});
-                    } else {
-                        setIsError(false);
+            .then(async res => {
+                try {
+                    const jsonRes = await res.json();
+                    if (res.status !== 200) {
+                        setIsError(true);
                         setMessage(jsonRes.message);
+                    } else {
+                        if (screenType === 'SignIn') {
+                            navigation.navigate('Your Existing Chits', { mobileNumber });
+                        } else {
+                            setIsError(false);
+                            setMessage(jsonRes.message);
+                        }
                     }
-                }
-            } catch (err) {
+                } catch (err) {
+                    console.log(err);
+                    setIsError(true);
+                    setMessage('There was a problem. Please try again later.');
+                };
+            })
+            .catch(err => {
                 console.log(err);
                 setIsError(true);
                 setMessage('There was a problem. Please try again later.');
-            };
-        })
-        .catch(err => {
-            console.log(err);
-            setIsError(true);
-            setMessage('There was a problem. Please try again later.');
-        });
+            });
     };
 
     const screenTypeHandler = (screenType) => {
@@ -108,12 +108,15 @@ const AuthScreen = () => {
     return (
         <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
             <ScrollView style={styles.card}>
+                {screenType === 'SignIn' && <Text style={styles.welcomeText}>Welcome to GHT online payment system</Text>}
+                {screenType === 'SignUpExisting' && <Text style={styles.welcomeText}>Kindly provide registered phone number and last receipt number</Text>}
+                {screenType === 'SignUpNew' && <Text style={styles.welcomeText}>Kindly provide all the below details to complete your new registration</Text>}
                 {screenType === 'SignIn' && <Image style={styles.logo} source={require('../public/images/logo.png')} />}
                 {screenType != 'SignIn' && <Text style={styles.heading}>Sign Up</Text>}
                 <View style={styles.form}>
                     <View style={styles.inputs}>
                         <TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
-                        {screenType === 'SignUpExisting' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Receipt No" value={receiptNo} onChangeText={setReceiptNo}></TextInput>}
+                        {screenType === 'SignUpExisting' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Last Receipt No" value={receiptNo} onChangeText={setReceiptNo}></TextInput>}
                         {screenType === 'SignUpNew' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Name" value={customerName} onChangeText={setCustomerName}></TextInput>}
                         {screenType === 'SignUpNew' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>}
                         {screenType === 'SignUpNew' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>}
@@ -121,29 +124,30 @@ const AuthScreen = () => {
                         {screenType === 'SignUpNew' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>}
                         <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>
                         {screenType != 'SignIn' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
-                        <Text style={[styles.message, {color: 'white'}]}>{message ? getMessage() : null}</Text>
+                        <Text style={[styles.message, { color: 'white' }]}>{message ? getMessage() : null}</Text>
                         <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
                             <Text style={styles.buttonText}>{screenType === 'SignIn' ? 'Sign In' : 'Sign Up'}</Text>
                         </TouchableOpacity>
                         {screenType === 'SignIn' &&
-                        <>
-                            <TouchableOpacity style={styles.buttonAlt} onPress={() => {screenTypeHandler('SignUpExisting')}}>
-                                <Text style={styles.buttonAltText}>Sign up if existing customer</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.buttonAltText}>or</Text>
-                            <TouchableOpacity style={styles.buttonAlt} onPress={() => {screenTypeHandler('SignUpNew')}}>
-                                <Text style={styles.buttonAltText}>Sign up if new customer</Text>
-                            </TouchableOpacity>
-                        </>
+                            <>
+                                <Text style={styles.normalText}>If you are an existing customer with GHT, please </Text>
+                                <TouchableOpacity style={styles.buttonAlt} onPress={() => { screenTypeHandler('SignUpExisting') }}>
+                                    <Text style={styles.buttonAltText}>click here</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.normalText}>If you are a new customer to GHT and would like to register, please </Text>
+                                <TouchableOpacity style={styles.buttonAlt} onPress={() => { screenTypeHandler('SignUpNew') }}>
+                                    <Text style={styles.buttonAltText}>click here</Text>
+                                </TouchableOpacity>
+                            </>
                         }
                         {screenType != 'SignIn' &&
-                        <>
-                            <TouchableOpacity style={styles.buttonAlt} onPress={() => {screenTypeHandler('SignIn')}}>
-                                <Text style={styles.buttonAltText}>Back to Sign In</Text>
-                            </TouchableOpacity>
-                        </>
+                            <>
+                                <TouchableOpacity style={styles.buttonAlt} onPress={() => { screenTypeHandler('SignIn') }}>
+                                    <Text style={styles.buttonAltText}>Back to Sign In</Text>
+                                </TouchableOpacity>
+                            </>
                         }
-                    </View>    
+                    </View>
                 </View>
             </ScrollView>
         </ImageBackground>
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         alignItems: 'center',
-    },  
+    },
     card: {
         flex: 1,
         backgroundColor: 'transparent',
@@ -169,6 +173,15 @@ const styles = StyleSheet.create({
         marginTop: '30%',
         marginLeft: '30%',
         marginBottom: '1%'
+    },
+    welcomeText: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        marginTop: '15%',
+        // marginLeft: '30%',
+        // marginTop: '5%',
+        // marginBottom: '30%',
+        color: 'white',
     },
     heading: {
         fontSize: 30,
@@ -190,15 +203,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingTop: '10%',
-    },  
+    },
     input: {
         width: '80%',
         borderBottomWidth: 2,
         borderBottomColor: 'white',
-        // paddingTop: '2%',
+        paddingTop: '2%',
         fontSize: 18,
-        fontWeight: 'bold',
-        fontStyle: 'italic',
+        // fontWeight: 'bold',
+        // fontStyle: 'italic',
         // minHeight: 40,
         color: 'white',
     },
@@ -216,7 +229,7 @@ const styles = StyleSheet.create({
         color: 'red',
         fontSize: 18,
         fontWeight: '600',
-        fontStyle: 'italic',
+        // fontStyle: 'italic',
     },
     buttonAlt: {
         width: '80%',
@@ -228,11 +241,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         // marginVertical: 5,
     },
+    normalText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: '200',
+        // fontStyle: 'underline',
+    },
     buttonAltText: {
         color: 'white',
         fontSize: 18,
         fontWeight: '600',
-        fontStyle: 'italic',
+        textDecorationLine: 'underline'
     },
     message: {
         fontSize: 16,

@@ -49,9 +49,9 @@ const MyChitsScreen = () => {
                 theme={{ colors: {primary: '#fff'} }}
                 content={
                   <>
-                    <Icon name='check' type='font-awesome' size={20} color={'white'} />
+                    <Icon name='money' type='font-awesome' size={20} color={'white'} />
                     <ListItem.Content>
-                      <ListItem.Title style={{color: 'white', fontWeight: 'bold'}}>{item.yrtrno}</ListItem.Title>
+                      <ListItem.Title style={{color: 'white', fontWeight: 'bold'}}>  Chit Number - {item.yrtrno}</ListItem.Title>
                       {/* <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle> */}
                     </ListItem.Content>
                   </>

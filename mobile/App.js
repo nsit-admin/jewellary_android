@@ -19,7 +19,7 @@ export default function App() {
           <NavigationContainer>
             <Stack.Navigator>
               <Stack.Screen name="Sign In" component={AuthScreen} options={{ headerShown:false }} />
-              <Stack.Screen name="My Chits" component={MyChitsScreen} 
+              <Stack.Screen name="Your Existing Chits" component={MyChitsScreen} 
                 options={{ headerTitleAlign: 'center', headerTintColor: 'white', headerBackVisible: true, headerTransparent: true}} />
             </Stack.Navigator>
           </NavigationContainer>
