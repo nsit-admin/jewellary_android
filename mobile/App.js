@@ -7,10 +7,12 @@ import { StatusBar } from 'expo-status-bar';
 
 import { AuthScreen } from './screens';
 import { MyChitsScreen } from './screens';
+import { AddSchemeScreen } from './screens';
 
 export default function App() {
 
   const Stack = createNativeStackNavigator();
+  const options = { headerTitleAlign: 'center', headerTintColor: 'white', headerBackVisible: true, headerTransparent: true};
 
   return (
     <SafeAreaProvider>
@@ -19,8 +21,8 @@ export default function App() {
           <NavigationContainer>
             <Stack.Navigator>
               <Stack.Screen name="Sign In" component={AuthScreen} options={{ headerShown:false }} />
-              <Stack.Screen name="Your Existing Chits" component={MyChitsScreen} 
-                options={{ headerTitleAlign: 'center', headerTintColor: 'white', headerBackVisible: true, headerTransparent: true}} />
+              <Stack.Screen name="Your Existing Chits" component={MyChitsScreen} options={options} />
+              <Stack.Screen name="Add Scheme" component={AddSchemeScreen} options={options} />
             </Stack.Navigator>
           </NavigationContainer>
         </View>
