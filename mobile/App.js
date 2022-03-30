@@ -1,23 +1,46 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View, ImageBackground } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StatusBar } from 'expo-status-bar';
 
 import { AuthScreen } from './screens';
+import { MyChitsScreen } from './screens';
 
 export default function App() {
+
+  const Stack = createNativeStackNavigator();
+
   return (
-    <View style={styles.container}>
-      <AuthScreen />
+    <SafeAreaProvider>
+      {/* <ImageBackground source={require('./public/images/gradient.png')} style={styles.image}> */}
+        <View style={styles.container}>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="Sign In" component={AuthScreen} options={{ headerShown:false }} />
+              <Stack.Screen name="My Chits" component={MyChitsScreen} 
+                options={{ headerTitleAlign: 'center', headerTintColor: 'white', headerBackVisible: true, headerTransparent: true}} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </View>
+      {/* </ImageBackground> */}
       <StatusBar style="auto" />
-    </View>
+    </SafeAreaProvider>
   );
 };
 
 const styles = StyleSheet.create({
+  image: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+  },  
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: 'transparent',
+    elevation: 9999
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
 });

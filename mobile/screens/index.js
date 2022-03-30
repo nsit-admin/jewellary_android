@@ -1,3 +1,4 @@
 import AuthScreen from './AuthScreen';
+import MyChitsScreen from './MyChitsScreen';
 
-export { AuthScreen };
+export { AuthScreen, MyChitsScreen };
