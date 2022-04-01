@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { signupExisting, signupNew, login, schemes, payment, isAuth, schemesAddition } from '../controllers/auth.js';
+import { signupExisting, signupNew, login, schemes, payment, isAuth, schemesAddition, sendOtp,  verifyOtp} from '../controllers/auth.js';
 
 const router = express.Router();
 
@@ -16,7 +16,9 @@ router.post('/api/schemes', schemesAddition);
 
 router.post('/api/payment', payment);
 
-router.post('/api/sms', signupExisting);
+router.post('/api/sendOtp', sendOtp);
+
+router.post('/api/verifyOtp', verifyOtp);
 
 router.get('/api/private', isAuth);
 

@@ -7,6 +7,7 @@ import Chits from '../models/chits.js';
 import ChitRec from '../models/chitsrec.js';
 import CustomerCreds from '../models/customer_creds.js'; 4
 import CustMaster from '../models/custmast.js';
+import OTP from '../models/otp.js';
 import sequelize from '../utils/database.js';
 
 
@@ -196,22 +197,26 @@ const payment = (req, res, next) => {
             if (!dbUser) {
                 return res.status(404).json({ message: "Gateway Error" });
             } else {
-                ChitRec.create({
-                    trno: req.body.trno,
-                    yrtrno: req.body.yrtrno,
-                    chitno: req.body.chitno,
-                    trdate: '',
-                    instno: req.body.instno,
-                    rate: '', // TODO - GEt it from other table during insertion
-                    wt: '', // TODO - Calculation to be done
-                    datestamp: new Date()
+                sequelize.query('SELECT max(trno) pkey from chitrec')
+                    .then((val) => {
+                        const pk = val[0][0].pkey
+                        ChitRec.create({
+                            trno: parseInt(pk) + 1,
+                            yrtrno: req.body.yrtrno,
+                            chitno: req.body.chitno,
+                            trdate: '',
+                            instno: req.body.instno,
+                            rate: '', // TODO - GEt it from other table during insertion
+                            wt: '', // TODO - Calculation to be done
+                            datestamp: new Date()
 
-                }).then((ins) => {
-                    console.log(ins)
-                    return res.status(200).json({ message: `payment completed for the chitNo - ${req.body.chitno}, your receipt number is ` });
-                }).catch((err) => {
-                    console.log(err)
-                })
+                        }).then((ins) => {
+                            console.log(ins)
+                            return res.status(200).json({ message: `payment completed for the chitNo - ${req.body.chitno}, your receipt number is ` });
+                        }).catch((err) => {
+                            console.log(err)
+                        })
+                    });
             };
         })
         .catch(err => {
@@ -230,25 +235,33 @@ const schemes = (req, res, next) => {
 };
 
 const schemesAddition = (req, res, next) => {
-    Chits.create({
-        trDate: new Date(),
-        trno: 555555,
-        yrtrno: 555555,
-        CustName: req.body.customerName,
-        MobileNo: req.body.mobileNumber,
-        Add1: req.body.address1,
-        Add2: req.body.address2,
-        Add3: req.body.address3,
-        Stcode: 1,
-        NoI: 11,
-        instamt: req.body.instamt,
-        Amt: 0.00,
-        wt: 0.000,
-    }).then((chits) => {
-        res.status(200).json({ chits: chits });
-    }).catch((err) => {
-        console.log(err)
-    })
+    sequelize.query('SELECT max(trno) pkey from chits')
+        .then((val) => {
+            console.log()
+            const pk = val[0][0].pkey
+            Chits.create({
+                trDate: new Date(),
+                trno: parseInt(pk) + 1,
+                yrtrno: parseInt(pk) + 1,
+                CustName: req.body.customerName,
+                MobileNo: req.body.mobileNumber,
+                Add1: req.body.address1,
+                Add2: req.body.address2,
+                Add3: req.body.address3,
+                Stcode: 1,
+                NoI: 11,
+                instamt: req.body.instamt,
+                Amt: 0.00,
+                wt: 0.000,
+            }).then((chits) => {
+                res.status(200).json({ chits: chits });
+            }).catch((err) => {
+                res.status(500).json({ message: "unexpected error occurred while adding new scheme", err });
+            })
+        }).catch((err) => {
+            res.status(500).json({ message: "unexpected error occurred while adding new scheme", err });
+        })
+
 };
 
 const isAuth = (req, res, next) => {
@@ -274,4 +287,85 @@ const sendSms = (mobileNumber) => {
     axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&Message=Thank%20you%20for%20shopping%20%40%20GURU%20HASTI%20THANGA%20MAALIGAI%2C%20POONAMALLEE.%20Please%20Visit%20again%20and%20again%21%20Have%20a%20great%20day%21&MobileNumbers=${mobileNumber}%2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`)
 }
 
-export { signupExisting, signupNew, login, schemes, payment, isAuth, schemesAddition };
+
+const sendOtpMsg = (mobileNumber, otp) => {
+    axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&
+    Message=Thank%20you%20for%20shopping%20%40%20GURU%20HASTI%20THANGA%20MAALIGAI%2C%20POONAMALLEE.%20
+    Please%20Visit%20again%20and%20again%21%20Have%20a%20great%20day%21&MobileNumbers=${mobileNumber}
+    %2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
+    console.log("sent the smsg");
+}
+
+
+const sendOtp = (req, res, next) => {
+    let otp = Math.floor(100000 + Math.random() * 900000);
+    var expiry = new Date();
+    expiry.setMinutes(expiry.getMinutes() + 1);
+    console.log(otp)
+    bcrypt.hash(otp.toString(), 6, (err, otpHash) => {
+        if (err) {
+            return res.status(500).json({ message: "couldnt hash the password", err });
+        } else {
+            OTP.create({
+                mobileNumber: req.body.mobileNumber,
+                otp_code: otp,
+                otp_expiry: expiry.toString(),
+                created_dt: new Date().toString()
+            }).then((otpRes) => {
+                sendOtpMsg(req.body.mobileNumber, otp);
+                return res.status(200).json({ message: "OTP sent" });
+            }).catch((err) => {
+                return res.status(200).json({ message: "OTP sent", err });
+            })
+        }
+    });
+
+}
+
+const checkOtpExists = (mobileNumber, otp) => {
+    OTP.findAll({
+        where: {
+            mobileNumber: mobileNumber,
+            otp_code: otp
+        }
+    }).then((otp) => {
+        if (otp) {
+            return true;
+        }
+    });
+}
+
+const verifyOtp = (req, res, next) => {
+    OTP.findOne({
+        where: {
+            mobileNumber: req.body.mobileNumber,
+            otp_code: req.body.otp
+        }
+    }).then((otpp) => {
+        if (otpp) {
+
+            OTP.update({
+                no_of_tries: parseInt(otpp.no_of_tries) + 1
+            }, {
+                where: {
+                    mobileNumber: req.body.mobileNumber,
+                    otp_code: req.body.otp
+                }
+            })
+
+            if (otpp.no_of_tries > 3) {
+                return res.status(200).json({ message: 'You have tried more than allowed limit of entries. Please try a new one' });
+            } else {
+                if (Date.parse(otpp.otp_expiry) > Date.parse(new Date().toString())) {
+                    return res.status(200).json({ message: 'OTP verified' });
+                } else {
+                    return res.status(200).json({ message: 'OTP expired, please try a new one' });
+                }
+            }
+        } else {
+            return res.status(200).json({ message: 'Entered OTP is not valid. Please enter the right one' });
+        }
+    })
+}
+
+export { signupExisting, signupNew, login, schemes, payment, isAuth, schemesAddition, sendSms, sendOtp, verifyOtp };

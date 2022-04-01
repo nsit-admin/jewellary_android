@@ -16,12 +16,83 @@ const AuthScreen = () => {
     const [address2, setAddress2] = useState('');
     const [address3, setAddress3] = useState('');
     const [instamt, setInstamt] = useState('');
+    const [otp, setOtp] = useState('');
 
     const [isError, setIsError] = useState(false);
+    const [isOtpVerified, setIsOtpVerified] = useState(false);
+    const [isOtpSent, setIsOtpSent] = useState(false);
+
+
     const [message, setMessage] = useState('');
     const [screenType, setScreenType] = useState('SignIn');
 
     const navigation = useNavigation();
+
+    const otpHandler = () => {
+        if (!isOtpSent) {
+            let endpoint = '/sendOtp';
+            let payload = {
+                mobileNumber,
+                otp
+            };
+            fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then(async res => {
+                    try {
+                        if (res.status !== 200) {
+                            setIsError(true);
+                            setMessage('There was a problem. Please try again later.');
+                        } else {
+                            setIsOtpSent(true);
+                        }
+                    } catch (err) {
+                        setIsError(true);
+                        setMessage('There was a problem. Please try again later.');
+                    };
+                })
+                .catch(err => {
+                    console.log(err);
+                    setIsError(true);
+                    setMessage('There was a problem. Please try again later.');
+                });
+        } else {
+            let endpoint = '/verifyOtp';
+            let payload = {
+                mobileNumber,
+                otp
+            };
+            fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then(async res => {
+                    try {
+                        if (res.status !== 200) {
+                            setIsError(true);
+                            setMessage('There was a problem. Please try again later.');
+                        } else {
+                            setIsOtpVerified(true);
+                        }
+                    } catch (err) {
+                        setIsError(true);
+                        setMessage('There was a problem. Please try again later.');
+                    };
+                })
+                .catch(err => {
+                    console.log(err);
+                    setIsError(true);
+                    setMessage('There was a problem. Please try again later.');
+                });
+        }
+    }
 
     const onSubmitHandler = () => {
         let endpoint = '';
@@ -38,12 +109,22 @@ const AuthScreen = () => {
                 password
             };
         } else if (screenType === 'SignUpExisting') {
-            endpoint = '/signup/existing';
-            payload = {
-                mobileNumber,
-                receiptNo,
-                password
-            };
+            if (isOtpVerified) {
+                endpoint = '/verify';
+                payload = {
+                    mobileNumber,
+                    receiptNo,
+                    password
+                };
+            } else {
+                endpoint = '/signup/existing';
+                payload = {
+                    mobileNumber,
+                    receiptNo,
+                    password
+                };
+            }
+
         } else {
             endpoint = '/login';
             payload = {
@@ -89,6 +170,7 @@ const AuthScreen = () => {
     const screenTypeHandler = (screenType) => {
         setMessage('');
         setMobileNumber('');
+        setOtp('');
         setPassword('');
         setConfirmPassword('');
         setReceiptNo('');
@@ -102,6 +184,7 @@ const AuthScreen = () => {
 
     const getMessage = () => {
         const status = isError ? `Error: ` : `Success: `;
+        // alert(status + message);
         return status + message;
     }
 
@@ -111,23 +194,40 @@ const AuthScreen = () => {
                 {screenType === 'SignIn' && <Text style={styles.welcomeText}>Welcome to GHT online payment system</Text>}
                 {screenType === 'SignUpExisting' && <Text style={styles.welcomeText}>Kindly provide registered phone number and last receipt number</Text>}
                 {screenType === 'SignUpNew' && <Text style={styles.welcomeText}>Kindly provide all the below details to complete your new registration</Text>}
-                {screenType === 'SignIn' && <Image style={styles.logo} source={require('../public/images/logo.png')} />}
+                {screenType === 'SignIn' && <Image style={styles.logo} source={require('../public/images/GHT-logo.jpg')} />}
                 {screenType != 'SignIn' && <Text style={styles.heading}>Sign Up</Text>}
                 <View style={styles.form}>
                     <View style={styles.inputs}>
                         <TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
+
+                        {screenType === 'SignIn' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
+
+                        {screenType === 'SignUpNew' && isOtpSent && !isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Otp" value={otp} onChangeText={setOtp}></TextInput>}
+                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Name" value={customerName} onChangeText={setCustomerName}></TextInput>}
+                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>}
+                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>}
+                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 3" value={address3} onChangeText={setAddress3}></TextInput>}
+                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>}
+                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
+                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
+
+                        {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
                         {screenType === 'SignUpExisting' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Last Receipt No" value={receiptNo} onChangeText={setReceiptNo}></TextInput>}
-                        {screenType === 'SignUpNew' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Name" value={customerName} onChangeText={setCustomerName}></TextInput>}
-                        {screenType === 'SignUpNew' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>}
-                        {screenType === 'SignUpNew' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>}
-                        {screenType === 'SignUpNew' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 3" value={address3} onChangeText={setAddress3}></TextInput>}
-                        {screenType === 'SignUpNew' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>}
-                        <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>
-                        {screenType != 'SignIn' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
+                        {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
+
                         <Text style={[styles.message, { color: 'white' }]}>{message ? getMessage() : null}</Text>
-                        <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
-                            <Text style={styles.buttonText}>{screenType === 'SignIn' ? 'Sign In' : 'Sign Up'}</Text>
-                        </TouchableOpacity>
+                        {screenType === 'SignUpNew' &&
+                            <TouchableOpacity style={styles.button} onPress={isOtpVerified ? onSubmitHandler : otpHandler}>
+                                {isOtpVerified && <Text style={styles.buttonText}>{'Register'}</Text>}
+                                {!isOtpVerified && <Text style={styles.buttonText}>{isOtpSent ? 'Verify Phone' : 'Send OTP'}</Text>}
+                            </TouchableOpacity>
+                        }
+                        {screenType !== 'SignUpNew' && (!isOtpSent || !isOtpVerified) &&
+                            <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
+                                {screenType === 'SignIn' && <Text style={styles.buttonText}>{'Sign In'}</Text>}
+                                {screenType === 'SignUpExisting' && <Text style={styles.buttonText}>{'Register'}</Text>}
+                            </TouchableOpacity>
+                        }
                         {screenType === 'SignIn' &&
                             <>
                                 <Text style={styles.normalText}>If you are an existing customer with GHT, please </Text>
@@ -227,7 +327,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: 'red',
-        fontSize: 18,
+        fontSize: 10,
         fontWeight: '600',
         // fontStyle: 'italic',
     },
