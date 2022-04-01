@@ -148,10 +148,10 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('simpleapp.keystore')
-            storePassword 'simpleapp'
-            keyAlias 'simpleapp'
-            keyPassword 'simpleapp'
+            storeFile file('ght.keystore')
+            storePassword 'ghtght'
+            keyAlias 'ght'
+            keyPassword 'ghtght'
         }
     }
     buildTypes {
