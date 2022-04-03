@@ -194,7 +194,7 @@ const AuthScreen = () => {
                 {screenType === 'SignIn' && <Text style={styles.welcomeText}>Welcome to GHT online payment system</Text>}
                 {screenType === 'SignUpExisting' && <Text style={styles.welcomeText}>Kindly provide registered phone number and last receipt number</Text>}
                 {screenType === 'SignUpNew' && <Text style={styles.welcomeText}>Kindly provide all the below details to complete your new registration</Text>}
-                {screenType === 'SignIn' && <Image style={styles.logo} source={require('../public/images/logo.png')} />}
+                {screenType === 'SignIn' && <Image style={styles.logo} source={require('../public/images/Guruhasti-Thangamaligai.png')} />}
                 {screenType != 'SignIn' && <Text style={styles.heading}>Sign Up</Text>}
                 <View style={styles.form}>
                     <View style={styles.inputs}>

@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import e from 'express';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-
+import dateformat from 'dateformat';
 import Chits from '../models/chits.js';
 import ChitRec from '../models/chitsrec.js';
 import CustomerCreds from '../models/customer_creds.js'; 4
@@ -33,7 +33,6 @@ const signupExisting = (req, res, next) => {
                         } else {
                             sequelize.query(`select chtrec.*, max(chtrec.DateStamp) from chits chts, chitrec chtrec where chts.MobileNo = ${req.body.mobileNumber} and chtrec.trno = ${req.body.receiptNo} and chts.TrNo = chtrec.ChitNo group by chtrec.ChitNo`)
                                 .then(chitReceipt => {
-                                    console.log(chitReceipt)
                                     if (!chitReceipt) {
                                         return res.status(409).json({ message: "Receipt Number isn't right, you have three more attempts remaingin" });
                                     } else if (req.body.mobileNumber && req.body.password) {
@@ -45,14 +44,12 @@ const signupExisting = (req, res, next) => {
                                                 return CustomerCreds.create({
                                                     mobileNumber: req.body.mobileNumber,
                                                     password: passwordHash,
-
                                                 })
                                                     .then(() => {
-                                                        res.status(200).json({ message: "user created for mobile use" });
+                                                        return res.status(200).json({ message: "user created for mobile use" });
                                                     })
                                                     .catch(err => {
-                                                        console.log(err);
-                                                        res.status(502).json({ message: "error while creating the user" });
+                                                        return res.status(502).json({ message: "error while creating the user" });
                                                     });
                                             };
                                         });
@@ -63,7 +60,7 @@ const signupExisting = (req, res, next) => {
             }
         })
         .catch(err => {
-            console.log('error', err);
+            return res.status(503).json({ message: "error while creating the user" });
         });
 };
 
@@ -97,37 +94,37 @@ const signupNew = (req, res, next) => {
                                         CustomerCreds.create({
                                             mobileNumber: req.body.mobileNumber,
                                             password: passwordHash,
-
                                         }).then(() => {
-                                            console.log(req.body)
+                                            sequelize.query('select max(trno) trno, yrtrno from chits')
                                             Chits.create({
-                                                trDate: new Date(),
-                                                yrtrno: 555555,
+                                                trDate: dateFormat(new Date(), "yyyy-mm-dd h:MM:ss"),
+                                                trno: parseInt(trno) + 1,
+                                                yrtrno: parseInt(yrtrno) + 1,
                                                 CustName: req.body.customerName,
                                                 MobileNo: req.body.mobileNumber,
                                                 Add1: req.body.address1,
                                                 Add2: req.body.address2,
                                                 Add3: req.body.address3,
                                                 Stcode: 1,
-                                                NoI: 12,
+                                                NoI: 11,
                                                 Amt: 0.00,
                                                 wt: 0.000,
                                             }).then(() => {
-                                                console.log('creating custmast')
                                                 CustMaster.create({
                                                     CustName: req.body.customerName,
                                                     MobileNo: req.body.mobileNumber,
                                                     Add1: req.body.address1,
                                                     Add2: req.body.address2,
                                                     Add3: req.body.address3,
-                                                    datestamp: '',
+                                                    datestamp: dateFormat(new Date(), "yyyy-mm-dd h:MM:ss"),
                                                 }).then(() => {
+                                                    sendNewSignupMsg(req.body.mobileNumber);
                                                     response = res.status(200).json({ message: "user created for mobile use" });
                                                 }).catch((err) => {
-                                                    console.log(err)
+                                                    response = res.status(502).json({ message: "error while creating the user" });
                                                 })
                                             }).catch((err) => {
-                                                console.log(err)
+                                                response = res.status(502).json({ message: "error while creating the user" });
                                             })
 
                                         })
@@ -145,7 +142,7 @@ const signupNew = (req, res, next) => {
             }
         })
         .catch(err => {
-            console.log('error', err);
+            return res.status(503).json({ message: "error while creating the user" });
         });
 };
 
@@ -175,7 +172,7 @@ const login = (req, res, next) => {
                             res.status(200).json({ message: "user logged in", chits: chits, "token": token });
                         })
                     } else { // password doesnt match
-                        res.status(401).json({ message: "invalid credentials" });
+                        res.status(401).json({ message: "mobile number or password is not correct" });
                     };
                 });
             };
@@ -212,6 +209,7 @@ const payment = (req, res, next) => {
 
                         }).then((ins) => {
                             console.log(ins)
+                            sendPaymentSuccess(req.body.mobileNumber);
                             return res.status(200).json({ message: `payment completed for the chitNo - ${req.body.chitno}, your receipt number is ` });
                         }).catch((err) => {
                             console.log(err)
@@ -225,12 +223,25 @@ const payment = (req, res, next) => {
 };
 
 const schemes = (req, res, next) => {
+    let receipts = [];
     Chits.findAll({
         where: {
             MobileNo: req.query.mobileNumber
         }
     }).then((chits) => {
-        res.status(200).json({ chits: chits });
+        if (chits) {
+            chits.forEach((cr) => {
+                ChitRec.findAll({
+                    where: {
+                        chitno: cr.trno
+                    }
+                }).then((rec) => {
+                    cr['receipts'] = rec;
+                    receipts.push(cr);
+                })
+            })
+            res.status(200).json({ chits: chits });
+        }
     })
 };
 
@@ -254,6 +265,7 @@ const schemesAddition = (req, res, next) => {
                 Amt: 0.00,
                 wt: 0.000,
             }).then((chits) => {
+                sendNewSignupMsg(req.body.mobileNumber);
                 res.status(200).json({ chits: chits });
             }).catch((err) => {
                 res.status(500).json({ message: "unexpected error occurred while adding new scheme", err });
@@ -294,6 +306,21 @@ const sendOtpMsg = (mobileNumber, otp) => {
     Please%20Visit%20again%20and%20again%21%20Have%20a%20great%20day%21&MobileNumbers=${mobileNumber}
     %2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
     console.log("sent the smsg");
+}
+
+const sendPaymentSuccess = (mobileNumber) => {
+    axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&
+    Message=Dear%20Customer,%20Thank%20you%20for%20the%20payment%20of%20your%20monthly%20saving%20scheme%20
+    with%20GURU%20HASTI%20THANGA%20MAALIGAI.%20Please%20pay%20on%20time%20regularly%20to%20avail%20exciting%20offers!&
+    MobileNumbers=${mobileNumber}
+    %2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
+}
+
+const sendNewSignupMsg = (mobileNumber) => {
+    axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&
+    Message=We%20value%20your%20relationship%20with%20GURU%20HASTI%20THANGA%20MAALIGAI%20by%20joining%20our%20monthly%20saving%20scheme%20today.%20Please%20pay%20regularly%20to%20avail%20exciting%20offers!&
+    MobileNumbers=${mobileNumber}
+    %2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
 }
 
 
