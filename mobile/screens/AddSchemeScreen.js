@@ -13,11 +13,18 @@ const AddSchemeScreen = () => {
   const [address3, setAddress3] = useState('');
   const [instamt, setInstamt] = useState('');
   const [message, setMessage] = useState('');
+  const [isFormValid, setIsFormValid] = useState(true);
 
   const route = useRoute();
   const navigation = useNavigation();
 
   const addScheme = () => {
+    if (!isFormValid || !mobileNumber || !customerName || !address1 || !address2 || !address3 || !instamt) {
+      if(!message) {
+        setMessage('Kindly provide all the details');
+      }
+      return;
+    }
     const payload = {
       mobileNumber,
       customerName,
@@ -37,7 +44,7 @@ const AddSchemeScreen = () => {
         try {
             const jsonRes = await res.json();
             if (res.status === 200) {
-              navigation.navigate('Your Existing Chits')
+              navigation.navigate('Your Existing Chits', { mobileNumber, reload: true })
             } else {
               setMessage(jsonRes.message)
             }
@@ -48,6 +55,18 @@ const AddSchemeScreen = () => {
     .catch(err => {
         console.log(err);
     });
+  };
+
+  const instamtChangeHandler = (input) => {
+    setInstamt(input);
+    const inpt = isNaN(input) ? 0 : Number(input);
+    if (inpt < 500 || inpt > 10000 || inpt % 500 != 0) {
+      setMessage('Please enter an amount between 500 and 10000 in denominations of 500');
+      setIsFormValid(false);
+    } else {
+      setMessage('');
+      setIsFormValid(true);
+    }
   };
 
   return (
@@ -61,7 +80,7 @@ const AddSchemeScreen = () => {
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 3" value={address3} onChangeText={setAddress3}></TextInput>
-            <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>
+            <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={(input) => instamtChangeHandler(input)}></TextInput>
             <Text style={[styles.message, { color: 'white' }]}>{message}</Text>
             <TouchableOpacity style={styles.button} onPress={addScheme}>
               <Text style={styles.buttonText}>Add Scheme</Text>
@@ -89,7 +108,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: '25%',
     color: 'white',
-    marginLeft: '5%',
+    marginHorizontal: '5%',
+    marginTop: '30%',
   },
   form: {
     flex: 1,
@@ -105,10 +125,10 @@ const styles = StyleSheet.create({
   },
   input: {
       width: '80%',
-      borderBottomWidth: 2,
+      borderBottomWidth: 1,
       borderBottomColor: 'white',
-      paddingTop: '2%',
-      fontSize: 18,
+      fontWeight: 'bold',
+      fontSize: 16,
       color: 'white',
   },
   button: {
@@ -127,7 +147,7 @@ const styles = StyleSheet.create({
   addScheme: {
     width: '35%',
     backgroundColor: 'white',
-    padding: '1%',
+    // padding: '1%',
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
@@ -140,8 +160,15 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 16,
-    marginVertical: '5%',
+    marginVertical: '10%',
+    marginHorizontal: '5%',
+    color: 'white',
   },
+  radioButtonText: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: 'white',
+  }
 });
 
 export default AddSchemeScreen;

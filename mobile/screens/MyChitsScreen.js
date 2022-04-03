@@ -13,8 +13,9 @@ const MyChitsScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    if (myChits.length === 0) {
+    if (myChits.length === 0 || route.params.reload) {
       getMySchemes();
+      route.params.reload = false;
     }
   });
 
@@ -44,19 +45,19 @@ const MyChitsScreen = () => {
   };
 
   const payDueHandler = (item) => {
-    const payload = {
-      mobileNumber: item.MobileNo,
-      trno: item.trno,
-      yrtrno: item.yrtrno,
-      chitno: item.yrtrno,
-      instno: Number(item.InstPaid) + 1,
-    };
+    // const payload = {
+    //   mobileNumber: item.MobileNo,
+    //   trno: item.trno,
+    //   yrtrno: item.yrtrno,
+    //   chitno: item.yrtrno,
+    //   instno: Number(item.InstPaid) + 1,
+    // };
     fetch(`${API_URL}/payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(item),
     })
     .then(async res => { 
         try {
@@ -76,9 +77,12 @@ const MyChitsScreen = () => {
   return (
     <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
       <View style={styles.chits}>
-        <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
-          <Text style={styles.addSchemeText}>Add Scheme</Text>
-        </TouchableOpacity>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={styles.heading}>Your Existing Chits</Text>
+          <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
+            <Text style={styles.addSchemeText}>Add Scheme</Text>
+          </TouchableOpacity>
+        </View>
         <FlatList
           keyExtractor={(item, index) => index.toString()}
           data={myChits}
@@ -107,7 +111,7 @@ const MyChitsScreen = () => {
                       <ListItem.Title style={{color: 'white', fontWeight: 'bold'}}>Due Amount:  {item.InstAmt ? item.InstAmt : '-'}</ListItem.Title>
                     </ListItem.Content>
                   </ListItem>
-                  {item.InstAmt &&  Math.floor((new Date().getTime() - new Date(item.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30 && 
+                  {Math.floor((new Date().getTime() - new Date(item.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30 && 
                     <ListItem theme={{ colors: {primary: '#fff'} }}>
                       <ListItem.Content>
                           <TouchableOpacity style={styles.button} onPress={() => { payDueHandler(item) }}>
@@ -133,7 +137,7 @@ const styles = StyleSheet.create({
   }, 
   chits: {
     flex: 1,
-    width: '100%',
+    width: '80%',
     marginTop: '20%',
   },
   chitDetails: {
@@ -154,18 +158,26 @@ const styles = StyleSheet.create({
       fontWeight: '600',
   },
   addScheme: {
-    width: '35%',
+    // width: '35%',
     backgroundColor: 'white',
-    padding: '1%',
+    paddingVertical: '2%',
+    paddingHorizontal: '5%',
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    margin: '5%'
+    margin: '5%',
+    marginLeft: '20%',
   },
   addSchemeText: {
     color: 'red',
     fontSize: 16,
     fontWeight: '600',
+  },
+  heading: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    color: 'white',
+    marginVertical: '6%',
   }
 });
 

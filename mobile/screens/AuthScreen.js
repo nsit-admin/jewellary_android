@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ImageBackground, View, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
 // const API_URL = Platform.OS === 'ios' ? 'http://localhost:5000' : 'http://10.0.2.2:5000';
 const API_URL = 'http://65.1.124.220:5000/api';
@@ -15,7 +15,6 @@ const AuthScreen = () => {
     const [address1, setAddress1] = useState('');
     const [address2, setAddress2] = useState('');
     const [address3, setAddress3] = useState('');
-    const [instamt, setInstamt] = useState('');
     const [otp, setOtp] = useState('');
 
     const [isError, setIsError] = useState(false);
@@ -26,7 +25,17 @@ const AuthScreen = () => {
     const [message, setMessage] = useState('');
     const [screenType, setScreenType] = useState('SignIn');
 
+    const route = useRoute();
     const navigation = useNavigation();
+
+    useEffect(() => {
+        if (route.params && route.params.logout) {
+            setMobileNumber('');
+            setPassword('');
+            setMessage('');
+            route.params.logout = false;
+        }
+    });
 
     const otpHandler = () => {
         if (!isOtpSent) {
@@ -105,7 +114,6 @@ const AuthScreen = () => {
                 address1,
                 address2,
                 address3,
-                instamt,
                 password
             };
         } else if (screenType === 'SignUpExisting') {
@@ -131,6 +139,18 @@ const AuthScreen = () => {
                 mobileNumber,
                 password
             };
+        }
+
+        if (!Object.values(payload).every(item => item)) {
+            if (screenType === 'SignIn') {
+                setMessage('Kindly enter mobile number and password');
+            } else {
+                setMessage('Kindly provide all the details');
+            }
+            return;
+        } else if ((screenType === 'SignUpNew' || screenType === 'SignUpExisting') && password != confirmPassword) {
+            setMessage('Password and Confirm Password does not match');
+            return;
         }
 
         fetch(`${API_URL}${endpoint}`, {
@@ -178,14 +198,15 @@ const AuthScreen = () => {
         setAddress1('');
         setAddress2('');
         setAddress3('');
-        setInstamt('');
+        setIsOtpSent(false);
+        setIsOtpVerified(false);
         setScreenType(screenType);
     };
 
     const getMessage = () => {
         const status = isError ? `Error: ` : `Success: `;
         // alert(status + message);
-        return status + message;
+        return message;
     }
 
     return (
@@ -207,12 +228,11 @@ const AuthScreen = () => {
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 3" value={address3} onChangeText={setAddress3}></TextInput>}
-                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>}
-                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
+                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
 
-                        {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
                         {screenType === 'SignUpExisting' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Last Receipt No" value={receiptNo} onChangeText={setReceiptNo}></TextInput>}
+                        {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
                         {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
 
                         <Text style={[styles.message, { color: 'white' }]}>{message ? getMessage() : null}</Text>
@@ -230,20 +250,21 @@ const AuthScreen = () => {
                         }
                         {screenType === 'SignIn' &&
                             <>
-                                <Text style={styles.normalText}>If you are an existing customer with GHT, please </Text>
-                                <TouchableOpacity style={styles.buttonAlt} onPress={() => { screenTypeHandler('SignUpExisting') }}>
-                                    <Text style={styles.buttonAltText}>click here</Text>
-                                </TouchableOpacity>
-                                <Text style={styles.normalText}>If you are a new customer to GHT and would like to register, please </Text>
-                                <TouchableOpacity style={styles.buttonAlt} onPress={() => { screenTypeHandler('SignUpNew') }}>
-                                    <Text style={styles.buttonAltText}>click here</Text>
-                                </TouchableOpacity>
+                                <Text style={styles.buttonAlt}>
+                                    <Text style={styles.normalText}>If you are an existing customer with GHT, please </Text>
+                                    <Text style={styles.linkText} onPress={() => { screenTypeHandler('SignUpExisting') }}>click here</Text>
+                                </Text>
+                                
+                                <Text style={styles.buttonAlt}>
+                                    <Text style={styles.normalText}>If you are a new customer to GHT and would like to register, please </Text>
+                                    <Text style={styles.linkText} onPress={() => { screenTypeHandler('SignUpNew') }}>click here</Text>
+                                </Text>
                             </>
                         }
                         {screenType != 'SignIn' &&
                             <>
-                                <TouchableOpacity style={styles.buttonAlt} onPress={() => { screenTypeHandler('SignIn') }}>
-                                    <Text style={styles.buttonAltText}>Back to Sign In</Text>
+                                <TouchableOpacity onPress={() => { screenTypeHandler('SignIn') }}>
+                                    <Text style={styles.linkText}>Back to Sign In</Text>
                                 </TouchableOpacity>
                             </>
                         }
@@ -270,23 +291,23 @@ const styles = StyleSheet.create({
         // paddingBottom: '30%',
     },
     logo: {
-        marginTop: '30%',
-        marginLeft: '30%',
-        marginBottom: '1%'
+        margin: '30%',
+        marginTop: '5%',
+        marginBottom: '1%',
     },
     welcomeText: {
         fontSize: 15,
         fontWeight: 'bold',
-        marginTop: '15%',
+        margin: '7%',
         // marginLeft: '30%',
-        // marginTop: '5%',
+        marginTop: '20%',
         // marginBottom: '30%',
         color: 'white',
     },
     heading: {
         fontSize: 30,
         fontWeight: 'bold',
-        marginTop: '15%',
+        marginTop: '7%',
         marginLeft: '30%',
         // marginTop: '5%',
         // marginBottom: '30%',
@@ -306,57 +327,64 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '80%',
-        borderBottomWidth: 2,
+        borderBottomWidth: 1,
         borderBottomColor: 'white',
-        paddingTop: '2%',
-        fontSize: 18,
-        // fontWeight: 'bold',
+        // paddingTop: '1%',
+        fontSize: 16,
+        fontWeight: 'bold',
         // fontStyle: 'italic',
         // minHeight: 40,
         color: 'white',
     },
     button: {
-        width: '30%',
+        // width: '30%',
         backgroundColor: 'white',
         // height: '15%',
-        padding: '2%',
+        paddingVertical: '3%',
+        paddingHorizontal: '5%',
         borderRadius: 50,
         justifyContent: 'center',
         alignItems: 'center',
         marginVertical: 5,
+        marginBottom: '7%',
     },
     buttonText: {
         color: 'red',
-        fontSize: 10,
+        fontSize: 15,
         fontWeight: '600',
         // fontStyle: 'italic',
     },
     buttonAlt: {
-        width: '80%',
+        // width: '80%',
         // borderWidth: 1,
-        height: 40,
+        // height: 40,
         // borderRadius: 50,
         // borderColor: 'white',
-        justifyContent: 'center',
-        alignItems: 'center',
+        // justifyContent: 'center',
+        // alignItems: 'center',
         // marginVertical: 5,
+        margin: '2%',
+        paddingTop: '7%',
+        borderTopWidth: 1,
+        borderTopColor: 'white',
     },
     normalText: {
         color: 'white',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '200',
-        // fontStyle: 'underline',
     },
-    buttonAltText: {
+    linkText: {
         color: 'white',
-        fontSize: 18,
-        fontWeight: '600',
-        textDecorationLine: 'underline'
+        fontSize: 16,
+        fontWeight: 'bold',
+        textDecorationLine: 'underline',
+        paddingLeft: '1%'
     },
     message: {
         fontSize: 16,
         marginVertical: '5%',
     },
+
 });
 
 export default AuthScreen;
