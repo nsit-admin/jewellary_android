@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { ImageBackground, View, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { RadioButton } from 'react-native-paper';
 
 const API_URL = 'http://65.1.124.220:5000/api';
 
 const AddSchemeScreen = () => {
 
+  const [chitType, setChitType] = useState('amount');
   const [mobileNumber, setMobileNumber] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [address1, setAddress1] = useState('');
@@ -33,6 +35,7 @@ const AddSchemeScreen = () => {
       }
     }
     const payload = {
+      chitType,
       mobileNumber,
       customerName,
       address1,
@@ -75,6 +78,23 @@ const AddSchemeScreen = () => {
         <Text style={styles.welcomeText}>Kindly provide all the below details to add scheme</Text>
         <View style={styles.form}>
           <View style={styles.inputs}>
+            <RadioButton.Group onValueChange={setChitType} value={chitType}>
+              <View style={{flexDirection: 'row'}}>
+                <Text style={styles.radioButtonText}>Chit Type: </Text>
+                <RadioButton
+                  color='white'
+                  uncheckedColor='white'
+                  value="amount"
+                />
+                <Text style={styles.radioButtonText}>Amount</Text>
+                <RadioButton
+                  color='white'
+                  uncheckedColor='white'
+                  value="weight"
+                />
+                <Text style={styles.radioButtonText}>Weight</Text>
+              </View>
+            </RadioButton.Group>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Name" value={customerName} onChangeText={setCustomerName}></TextInput>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>
@@ -168,6 +188,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: 'white',
+    marginTop: 6,
   }
 });
 
