@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, View, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Image } from 'react-native';
+import { ImageBackground, View, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Image, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
 // const API_URL = Platform.OS === 'ios' ? 'http://localhost:5000' : 'http://10.0.2.2:5000';
@@ -32,7 +32,7 @@ const AuthScreen = () => {
         if (route.params && route.params.logout) {
             setMobileNumber('');
             setPassword('');
-            setMessage('');
+            // setMessage('');
             route.params.logout = false;
         }
     });
@@ -44,6 +44,10 @@ const AuthScreen = () => {
                 mobileNumber,
                 otp
             };
+            if (!mobileNumber) {
+                showAlert('Kindly enter mobile number');
+                return;
+            }
             fetch(`${API_URL}${endpoint}`, {
                 method: 'POST',
                 headers: {
@@ -55,19 +59,22 @@ const AuthScreen = () => {
                     try {
                         if (res.status !== 200) {
                             setIsError(true);
-                            setMessage('There was a problem. Please try again later.');
+                            // setMessage('There was a problem. Please try again later.');
+                            showAlert('There was a problem. Please try again later.');
                         } else {
                             setIsOtpSent(true);
                         }
                     } catch (err) {
                         setIsError(true);
-                        setMessage('There was a problem. Please try again later.');
+                        // setMessage('There was a problem. Please try again later.');
+                        showAlert('There was a problem. Please try again later.');
                     };
                 })
                 .catch(err => {
                     console.log(err);
                     setIsError(true);
-                    setMessage('There was a problem. Please try again later.');
+                    // setMessage('There was a problem. Please try again later.');
+                    showAlert('There was a problem. Please try again later.');
                 });
         } else {
             let endpoint = '/verifyOtp';
@@ -75,6 +82,10 @@ const AuthScreen = () => {
                 mobileNumber,
                 otp
             };
+            if (!otp) {
+                showAlert('Kindly enter otp');
+                return;
+            }
             fetch(`${API_URL}${endpoint}`, {
                 method: 'POST',
                 headers: {
@@ -86,19 +97,22 @@ const AuthScreen = () => {
                     try {
                         if (res.status !== 200) {
                             setIsError(true);
-                            setMessage('There was a problem. Please try again later.');
+                            // setMessage('There was a problem. Please try again later.');
+                            showAlert('There was a problem. Please try again later.');
                         } else {
                             setIsOtpVerified(true);
                         }
                     } catch (err) {
                         setIsError(true);
-                        setMessage('There was a problem. Please try again later.');
+                        // setMessage('There was a problem. Please try again later.');
+                        showAlert('There was a problem. Please try again later.');
                     };
                 })
                 .catch(err => {
                     console.log(err);
                     setIsError(true);
-                    setMessage('There was a problem. Please try again later.');
+                    // setMessage('There was a problem. Please try again later.');
+                    showAlert('There was a problem. Please try again later.');
                 });
         }
     }
@@ -143,13 +157,16 @@ const AuthScreen = () => {
 
         if (!Object.values(payload).every(item => item)) {
             if (screenType === 'SignIn') {
-                setMessage('Kindly enter mobile number and password');
+                // setMessage('Kindly enter mobile number and password');
+                showAlert('Kindly enter mobile number and password');
             } else {
-                setMessage('Kindly provide all the details');
+                // setMessage('Kindly provide all the details');
+                showAlert('Kindly provide all the details');
             }
             return;
         } else if ((screenType === 'SignUpNew' || screenType === 'SignUpExisting') && password != confirmPassword) {
-            setMessage('Password and Confirm Password does not match');
+            // setMessage('Password and Confirm Password does not match');
+            showAlert('Password and Confirm Password does not match');
             return;
         }
 
@@ -165,30 +182,34 @@ const AuthScreen = () => {
                     const jsonRes = await res.json();
                     if (res.status !== 200) {
                         setIsError(true);
-                        setMessage(jsonRes.message);
+                        // setMessage(jsonRes.message);
+                        showAlert(jsonRes.message);
                     } else {
                         if (screenType === 'SignIn') {
                             navigation.navigate('Your Existing Chits', { mobileNumber });
                         } else {
                             setIsError(false);
-                            setMessage(jsonRes.message);
+                            // setMessage(jsonRes.message);
+                            showAlert(jsonRes.message);
                         }
                     }
                 } catch (err) {
                     console.log(err);
                     setIsError(true);
-                    setMessage('There was a problem. Please try again later.');
+                    // setMessage('There was a problem. Please try again later.');
+                    showAlert('There was a problem. Please try again later.');
                 };
             })
             .catch(err => {
                 console.log(err);
                 setIsError(true);
-                setMessage('There was a problem. Please try again later.');
+                // setMessage('There was a problem. Please try again later.');
+                showAlert('There was a problem. Please try again later.');
             });
     };
 
     const screenTypeHandler = (screenType) => {
-        setMessage('');
+        // setMessage('');
         setMobileNumber('');
         setOtp('');
         setPassword('');
@@ -209,6 +230,10 @@ const AuthScreen = () => {
         return message;
     }
 
+    const showAlert = (message) => {
+        Alert.alert(message);
+    }
+
     return (
         <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
             <ScrollView style={styles.card}>
@@ -219,7 +244,7 @@ const AuthScreen = () => {
                 {screenType != 'SignIn' && <Text style={styles.heading}>Sign Up</Text>}
                 <View style={styles.form}>
                     <View style={styles.inputs}>
-                        <TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
+                        <TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber} editable={!isOtpSent}></TextInput>
 
                         {screenType === 'SignIn' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
 

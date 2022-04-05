@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ImageBackground, View, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
+import { ImageBackground, View, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
 const API_URL = 'http://65.1.124.220:5000/api';
@@ -19,11 +19,18 @@ const AddSchemeScreen = () => {
   const navigation = useNavigation();
 
   const addScheme = () => {
-    if (!isFormValid || !mobileNumber || !customerName || !address1 || !address2 || !address3 || !instamt) {
-      if(!message) {
-        setMessage('Kindly provide all the details');
-      }
+    if (!mobileNumber || !customerName || !address1 || !address2 || !address3 || !instamt) {
+      // if(!message) {
+        // setMessage('Kindly provide all the details');
+        showAlert('Kindly provide all the details');
+      // }
       return;
+    } else {
+      const inpt = isNaN(instamt) ? 0 : Number(instamt);
+      if (inpt < 500 || inpt > 10000 || inpt % 500 != 0) {
+        showAlert('Please enter an amount between 500 and 10000 in denominations of 500');
+        return;
+      }
     }
     const payload = {
       mobileNumber,
@@ -46,7 +53,8 @@ const AddSchemeScreen = () => {
             if (res.status === 200) {
               navigation.navigate('Your Existing Chits', { mobileNumber, reload: true })
             } else {
-              setMessage(jsonRes.message)
+              // setMessage(jsonRes.message);
+              showAlert(jsonRes.message);
             }
         } catch (err) {
             console.log(err);
@@ -57,17 +65,9 @@ const AddSchemeScreen = () => {
     });
   };
 
-  const instamtChangeHandler = (input) => {
-    setInstamt(input);
-    const inpt = isNaN(input) ? 0 : Number(input);
-    if (inpt < 500 || inpt > 10000 || inpt % 500 != 0) {
-      setMessage('Please enter an amount between 500 and 10000 in denominations of 500');
-      setIsFormValid(false);
-    } else {
-      setMessage('');
-      setIsFormValid(true);
-    }
-  };
+  const showAlert = (message) => {
+    Alert.alert(message);
+  }
 
   return (
     <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
@@ -80,7 +80,7 @@ const AddSchemeScreen = () => {
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 3" value={address3} onChangeText={setAddress3}></TextInput>
-            <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={(input) => instamtChangeHandler(input)}></TextInput>
+            <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>
             <Text style={[styles.message, { color: 'white' }]}>{message}</Text>
             <TouchableOpacity style={styles.button} onPress={addScheme}>
               <Text style={styles.buttonText}>Add Scheme</Text>
