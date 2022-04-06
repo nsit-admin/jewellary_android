@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.mobile",
+  "applicationId": "com.ght",
   "variantName": "processReleaseResources",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
-      "versionCode": 1,
-      "versionName": "1.0",
-      "outputFile": "app-release.apk"
+      "versionCode": 2,
+      "versionName": "1.0.0",
+      "outputFile": "ght-prod.apk"
     }
   ]
 }
