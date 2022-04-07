@@ -187,7 +187,7 @@ const payment = (req, res, next) => {
     // checks if mobile number exists
     Chits.findOne({ // THIS WILL BE PAYMENT GATEWAAY CALL
         where: {
-            MobileNo: req.body.mobileNumber,
+            MobileNo: req.body.MobileNo,
         }
     })
         .then(dbUser => {
@@ -200,7 +200,7 @@ const payment = (req, res, next) => {
                         ChitRec.create({
                             trno: parseInt(pk) + 1,
                             yrtrno: req.body.yrtrno,
-                            chitno: req.body.chitno,
+                            chitno: req.body.trno,
                             trdate: '',
                             instno: req.body.instno,
                             rate: '', // TODO - GEt it from other table during insertion

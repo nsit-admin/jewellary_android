@@ -22,7 +22,6 @@ const AddSchemeScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    console.log(route.params.myChits);
     const chit = route.params.myChits[0];
     if(chit) {
       setMobileNumber(chit.MobileNo);
