@@ -120,7 +120,13 @@ const AuthScreen = () => {
     const onSubmitHandler = () => {
         let endpoint = '';
         let payload;
-        if (screenType === 'SignUpNew') {
+        if (screenType === 'forgotPassword') {
+            endpoint = '/forgot-pass';
+            payload = {
+                mobileNumber,
+                receiptNo
+            };
+        } else if (screenType === 'SignUpNew') {
             endpoint = '/signup/new';
             payload = {
                 mobileNumber,
@@ -155,7 +161,7 @@ const AuthScreen = () => {
             };
         }
 
-        if (!Object.values(payload).every(item => item)) {
+        if (payload && !Object.values(payload).every(item => item)) {
             if (screenType === 'SignIn') {
                 // setMessage('Kindly enter mobile number and password');
                 showAlert('Kindly enter mobile number and password');
@@ -169,7 +175,6 @@ const AuthScreen = () => {
             showAlert('Password and Confirm Password does not match');
             return;
         }
-
         fetch(`${API_URL}${endpoint}`, {
             method: 'POST',
             headers: {
@@ -237,14 +242,16 @@ const AuthScreen = () => {
     return (
         <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
             <ScrollView style={styles.card}>
-                {screenType === 'SignIn' && <Text style={styles.welcomeText}>Welcome to GHT online payment system</Text>}
+                {(screenType === 'SignIn' || screenType === 'forgotPassword') && <Text style={styles.headline}>Guru Hasti Thanga Maaliai</Text>}
+                {screenType === 'SignIn' && <Text style={styles.welcomeText}>Welcome to Chit Online Payment System</Text>}
                 {screenType === 'SignUpExisting' && <Text style={styles.welcomeText}>Kindly provide registered phone number and last receipt number</Text>}
                 {screenType === 'SignUpNew' && <Text style={styles.welcomeText}>Kindly provide all the below details to complete your new registration</Text>}
                 {screenType === 'SignIn' && <Image style={styles.logo} source={require('../public/images/Guruhasti-Thangamaligai.png')} />}
-                {screenType != 'SignIn' && <Text style={styles.heading}>Sign Up</Text>}
+                {(screenType === 'SignUpNew' || screenType === 'SignUpExisting') && <Text style={styles.heading}>Sign Up</Text>}
+                {screenType === 'forgotPassword' && <Text style={styles.welcomeText}>Forgot Password</Text>}
                 <View style={styles.form}>
                     <View style={styles.inputs}>
-                        <TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber} editable={!isOtpSent}></TextInput>
+                        <TextInput style={styles.input} editable='{isOtpSent}' placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber} editable={!isOtpSent}></TextInput>
 
                         {screenType === 'SignIn' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
 
@@ -256,7 +263,7 @@ const AuthScreen = () => {
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
 
-                        {screenType === 'SignUpExisting' && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Last Receipt No" value={receiptNo} onChangeText={setReceiptNo}></TextInput>}
+                        {(screenType === 'SignUpExisting' || screenType === 'forgotPassword') && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Last Receipt No" value={receiptNo} onChangeText={setReceiptNo}></TextInput>}
                         {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
                         {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
 
@@ -267,19 +274,24 @@ const AuthScreen = () => {
                                 {!isOtpVerified && <Text style={styles.buttonText}>{isOtpSent ? 'Verify Phone' : 'Send OTP'}</Text>}
                             </TouchableOpacity>
                         }
-                        {screenType !== 'SignUpNew' && (!isOtpSent || !isOtpVerified) &&
+                        {(screenType === 'SignIn' || screenType === 'SignUpExisting') && (!isOtpSent || !isOtpVerified) &&
                             <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
                                 {screenType === 'SignIn' && <Text style={styles.buttonText}>{'Sign In'}</Text>}
                                 {screenType === 'SignUpExisting' && <Text style={styles.buttonText}>{'Register'}</Text>}
                             </TouchableOpacity>
                         }
+                        {(screenType === 'forgotPassword') &&
+                            <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
+                                {screenType === 'forgotPassword' && <Text style={styles.buttonText}>{'Send Password'}</Text>}
+                            </TouchableOpacity>
+                        }
+                        {screenType === 'SignIn' && <Text style={styles.linkText} onPress={() => { screenTypeHandler('forgotPassword') }}>Forgot Password</Text>}
                         {screenType === 'SignIn' &&
                             <>
                                 <Text style={styles.buttonAlt}>
                                     <Text style={styles.normalText}>If you are an existing customer with GHT, please </Text>
                                     <Text style={styles.linkText} onPress={() => { screenTypeHandler('SignUpExisting') }}>click here</Text>
                                 </Text>
-                                
                                 <Text style={styles.buttonAlt}>
                                     <Text style={styles.normalText}>If you are a new customer to GHT and would like to register, please </Text>
                                     <Text style={styles.linkText} onPress={() => { screenTypeHandler('SignUpNew') }}>click here</Text>
@@ -319,6 +331,16 @@ const styles = StyleSheet.create({
         margin: '30%',
         marginTop: '5%',
         marginBottom: '1%',
+    },
+    headline: {
+        textAlign: 'center', // <-- the magic
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginTop: '2%',
+        marginBottom: 0,
+        // width: auto,
+        color: 'white',
+        // backgroundColor: 'yellow',
     },
     welcomeText: {
         fontSize: 15,
@@ -403,7 +425,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         textDecorationLine: 'underline',
-        paddingLeft: '1%'
+        // paddingLeft: '1%'
     },
     message: {
         fontSize: 16,

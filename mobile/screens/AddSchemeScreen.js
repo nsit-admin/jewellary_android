@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ImageBackground, View, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { RadioButton } from 'react-native-paper';
@@ -13,6 +13,7 @@ const AddSchemeScreen = () => {
   const [address1, setAddress1] = useState('');
   const [address2, setAddress2] = useState('');
   const [address3, setAddress3] = useState('');
+  const [isEditable, setIsEditable] = useState(true);
   const [instamt, setInstamt] = useState('');
   const [message, setMessage] = useState('');
   const [isFormValid, setIsFormValid] = useState(true);
@@ -20,8 +21,22 @@ const AddSchemeScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
 
+  useEffect(() => {
+    console.log(route.params.myChits);
+    const chit = route.params.myChits[0];
+    if(chit) {
+      setMobileNumber(chit.MobileNo);
+      setCustomerName(chit.CustName);
+      setAddress1(chit.Add1);
+      setAddress2(chit.Add2);
+      setAddress3(chit.Add3);
+      // setIsEditable(false);
+    }
+
+  })
+
   const addScheme = () => {
-    if (!mobileNumber || !customerName || !address1 || !address2 || !address3 || !instamt) {
+    if (!instamt) {
       // if(!message) {
         // setMessage('Kindly provide all the details');
         showAlert('Kindly provide all the details');
@@ -95,7 +110,7 @@ const AddSchemeScreen = () => {
                 <Text style={styles.radioButtonText}>Weight</Text>
               </View>
             </RadioButton.Group>
-            <TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
+            <TextInput style={styles.input} editable = '{isEditable}' placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Name" value={customerName} onChangeText={setCustomerName}></TextInput>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>
@@ -103,7 +118,7 @@ const AddSchemeScreen = () => {
             <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>
             <Text style={[styles.message, { color: 'white' }]}>{message}</Text>
             <TouchableOpacity style={styles.button} onPress={addScheme}>
-              <Text style={styles.buttonText}>Add Scheme</Text>
+              <Text style={styles.buttonText}>Proceed</Text>
             </TouchableOpacity>
           </View>
         </View>

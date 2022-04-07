@@ -41,7 +41,7 @@ const MyChitsScreen = () => {
   };
 
   const addSchemeHandler = () => {
-    navigation.navigate('Add Scheme');
+    navigation.navigate('Add Scheme', { myChits });
   };
 
   const payDueHandler = (item) => {

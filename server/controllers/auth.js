@@ -395,4 +395,23 @@ const verifyOtp = (req, res, next) => {
     })
 }
 
-export { signupExisting, signupNew, login, schemes, payment, isAuth, schemesAddition, sendSms, sendOtp, verifyOtp };
+const forgotPassword = (req, res, next) => {
+    sequelize.query(`select chtrec.*, max(chtrec.DateStamp) from chits chts, chitrec chtrec, mobile_customers mcs where mcs.mobileNumber = chts.MobileNo and chts.MobileNo = 
+    ${req.body.mobileNumber} and chtrec.trno = ${req.body.receiptNo} and chts.TrNo = chtrec.ChitNo group by chtrec.ChitNo`)
+        .then(chitReceipt => {
+            if (chitReceipt.length && chitReceipt[0].length) {
+                // TODO 
+
+                // send the password thru SMS
+
+                res.status(200).json({message: 'SMS will be sent to the registered phone number'});
+            } else {
+                res.status(200).json({message: 'SMS will be sent to the registered phone number if the data provided is valid'});
+            }
+        })
+        .catch(err => {
+
+        })
+}
+
+export { forgotPassword, signupExisting, signupNew, login, schemes, payment, isAuth, schemesAddition, sendSms, sendOtp, verifyOtp };
