@@ -108,7 +108,9 @@ const MyChitsScreen = () => {
                 <View style={styles.chitDetails}>
                   <ListItem theme={{ colors: {primary: '#fff'} }}>
                     <ListItem.Content>
-                      <ListItem.Title style={{color: 'white', fontWeight: 'bold'}}>Due Amount:  {item.InstAmt ? item.InstAmt : '-'}</ListItem.Title>
+                      <ListItem.Title style={{color: 'white'}}>Name: {item.custname}</ListItem.Title>
+                      <ListItem.Title style={{color: 'white'}}>Last Inst Paid: {item.InstAmt}</ListItem.Title>
+                      <ListItem.Subtitle style={{color: 'white', fontWeight: 'bold'}}>Due Amount:  {item.InstAmt ? item.InstAmt : '-'}</ListItem.Subtitle>
                     </ListItem.Content>
                   </ListItem>
                   {Math.floor((new Date().getTime() - new Date(item.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30 && 

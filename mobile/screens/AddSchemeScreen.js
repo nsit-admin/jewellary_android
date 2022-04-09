@@ -21,18 +21,18 @@ const AddSchemeScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const chit = route.params.myChits[0];
-    if(chit) {
-      setMobileNumber(chit.MobileNo);
-      setCustomerName(chit.CustName);
-      setAddress1(chit.Add1);
-      setAddress2(chit.Add2);
-      setAddress3(chit.Add3);
-      // setIsEditable(false);
-    }
+  // useEffect(() => {
+  //   const chit = route.params.myChits[0];
+  //   if(chit) {
+  //     setMobileNumber(chit.MobileNo);
+  //     setCustomerName(chit.CustName);
+  //     setAddress1(chit.Add1);
+  //     setAddress2(chit.Add2);
+  //     setAddress3(chit.Add3);
+  //     setIsEditable(false);
+  //   }
 
-  })
+  // })
 
   const addScheme = () => {
     if (!instamt) {
@@ -56,6 +56,7 @@ const AddSchemeScreen = () => {
       address2,
       address3,
       instamt,
+      chitType
     };
     fetch(`${API_URL}/schemes`, {
         method: 'POST',
@@ -98,24 +99,25 @@ const AddSchemeScreen = () => {
                 <RadioButton
                   color='white'
                   uncheckedColor='white'
-                  value="amount"
+                  value="cash"
                 />
-                <Text style={styles.radioButtonText}>Amount</Text>
+                <Text style={styles.radioButtonText}>Cash</Text>
                 <RadioButton
                   color='white'
                   uncheckedColor='white'
-                  value="weight"
+                  value="metal"
                 />
-                <Text style={styles.radioButtonText}>Weight</Text>
+                <Text style={styles.radioButtonText}>Metal</Text>
               </View>
             </RadioButton.Group>
-            <TextInput style={styles.input} editable = '{isEditable}' placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
-            <TextInput style={styles.input} placeholderTextColor='white' placeholder="Name" value={customerName} onChangeText={setCustomerName}></TextInput>
-            <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>
-            <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>
-            <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 3" value={address3} onChangeText={setAddress3}></TextInput>
-            <TextInput style={styles.input} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>
-            <Text style={[styles.message, { color: 'white' }]}>{message}</Text>
+            <TextInput style={styles.input} editable = '{isEditable}' placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={route.params.myChits[0].MobileNo} onChangeText={setMobileNumber}></TextInput>
+            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Name" defaultValue={route.params.myChits[0].CustName} onChangeText={setCustomerName}></TextInput>
+            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Address Line 1" defaultValue={route.params.myChits[0].Add1} onChangeText={setAddress1}></TextInput>
+            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Address Line 2" defaultValue={route.params.myChits[0].Add2} onChangeText={setAddress2}></TextInput>
+            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Address Line 3" defaultValue={route.params.myChits[0].Add3} onChangeText={setAddress3}></TextInput>
+            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>
+            
+            {/* <Text style={[styles.message, { color: 'white' }]}>{message}</Text> */}
             <TouchableOpacity style={styles.button} onPress={addScheme}>
               <Text style={styles.buttonText}>Proceed</Text>
             </TouchableOpacity>

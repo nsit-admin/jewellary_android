@@ -226,7 +226,8 @@ const schemes = (req, res, next) => {
     let receipts = [];
     Chits.findAll({
         where: {
-            MobileNo: req.query.mobileNumber
+            MobileNo: req.query.mobileNumber,
+            setno: null || 0
         }
     }).then((chits) => {
         if (chits) {
@@ -262,6 +263,7 @@ const schemesAddition = (req, res, next) => {
                 Stcode: 1,
                 NoI: 11,
                 instamt: req.body.instamt,
+                bonus: req.body.instamt,
                 Amt: 0.00,
                 wt: 0.000,
             }).then((chits) => {
