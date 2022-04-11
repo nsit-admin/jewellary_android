@@ -12,6 +12,10 @@ const MyChitsScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
 
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const d = new Date();
+  let monthName = months[d.getMonth()]
+
   useEffect(() => {
     if (myChits.length === 0 || route.params.reload) {
       getMySchemes();
@@ -78,7 +82,7 @@ const MyChitsScreen = () => {
     <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
       <View style={styles.chits}>
         <View style={{flexDirection: 'row'}}>
-          <Text style={styles.heading}>Your Existing Chits</Text>
+          <Text style={styles.heading}>Guru Hasti Chits</Text>
           <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
             <Text style={styles.addSchemeText}>Add Scheme</Text>
           </TouchableOpacity>
@@ -108,9 +112,9 @@ const MyChitsScreen = () => {
                 <View style={styles.chitDetails}>
                   <ListItem theme={{ colors: {primary: '#fff'} }}>
                     <ListItem.Content>
-                      <ListItem.Title style={{color: 'white'}}>Name: {item.custname}</ListItem.Title>
+                      <ListItem.Title style={{color: 'white'}}>Name: {item.CustName}</ListItem.Title>
                       <ListItem.Title style={{color: 'white'}}>Last Inst Paid: {item.InstAmt}</ListItem.Title>
-                      <ListItem.Subtitle style={{color: 'white', fontWeight: 'bold'}}>Due Amount:  {item.InstAmt ? item.InstAmt : '-'}</ListItem.Subtitle>
+                      <ListItem.Subtitle style={{color: 'white', fontWeight: 'bold'}}>Current Due: {monthName.toUpperCase()} 2022 - {item.InstAmt ? item.InstAmt : '-'}</ListItem.Subtitle>
                     </ListItem.Content>
                   </ListItem>
                   {Math.floor((new Date().getTime() - new Date(item.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30 && 

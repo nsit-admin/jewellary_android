@@ -2,10 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { ImageBackground, View, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { RadioButton } from 'react-native-paper';
+// import {StyleSheet, View, ScrollView} from 'react-native';
 
 const API_URL = 'http://65.1.124.220:5000/api';
 
 const AddSchemeScreen = () => {
+
+  const instData = [
+    { label: 'Plan - 500', value: '500' },
+    { label: 'Plan - 1000', value: '1000' },
+    { label: 'Plan - 2000', value: '2000' },
+    { label: 'Plan - 3000', value: '3000' },
+    { label: 'Plan - 4000', value: '4000' },
+    { label: 'Plan - 5000', value: '5000' },
+    { label: 'Plan - 10000', value: '10000' },
+  ];
 
   const [chitType, setChitType] = useState('amount');
   const [mobileNumber, setMobileNumber] = useState('');
@@ -21,18 +32,18 @@ const AddSchemeScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
 
-  // useEffect(() => {
-  //   const chit = route.params.myChits[0];
-  //   if(chit) {
-  //     setMobileNumber(chit.MobileNo);
-  //     setCustomerName(chit.CustName);
-  //     setAddress1(chit.Add1);
-  //     setAddress2(chit.Add2);
-  //     setAddress3(chit.Add3);
-  //     setIsEditable(false);
-  //   }
+  useEffect(() => {
+    const chit = route.params.myChits[0];
+    if(chit) {
+      setMobileNumber(chit.MobileNo);
+      setCustomerName(chit.CustName);
+      setAddress1(chit.Add1);
+      setAddress2(chit.Add2);
+      setAddress3(chit.Add3);
+      setIsEditable(false);
+    }
 
-  // })
+  })
 
   const addScheme = () => {
     if (!instamt) {
@@ -44,7 +55,7 @@ const AddSchemeScreen = () => {
     } else {
       const inpt = isNaN(instamt) ? 0 : Number(instamt);
       if (inpt < 500 || inpt > 10000 || inpt % 500 != 0) {
-        showAlert('Please enter an amount between 500 and 10000 in denominations of 500');
+        showAlert('Please enter 500, 1000, 2000, 3000, 4000, 5000 or 10000');
         return;
       }
     }
@@ -69,7 +80,7 @@ const AddSchemeScreen = () => {
         try {
             const jsonRes = await res.json();
             if (res.status === 200) {
-              navigation.navigate('Your Existing Chits', { mobileNumber, reload: true })
+              navigation.navigate('Guru Hasti Chit Details', { mobileNumber, reload: true })
             } else {
               // setMessage(jsonRes.message);
               showAlert(jsonRes.message);
@@ -110,18 +121,30 @@ const AddSchemeScreen = () => {
                 <Text style={styles.radioButtonText}>Metal</Text>
               </View>
             </RadioButton.Group>
-            <TextInput style={styles.input} editable = '{isEditable}' placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={route.params.myChits[0].MobileNo} onChangeText={setMobileNumber}></TextInput>
-            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Name" defaultValue={route.params.myChits[0].CustName} onChangeText={setCustomerName}></TextInput>
+            <TextInput style={styles.input} editable = '{isEditable}' placeholderTextColor='white' placeholder='Mobile Number' autoCapitalize='none' value={route.params.myChits[0].MobileNo} onChangeText={setMobileNumber}></TextInput>
+            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Customer Name" defaultValue={route.params.myChits[0].CustName} onChangeText={setCustomerName}></TextInput>
             <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Address Line 1" defaultValue={route.params.myChits[0].Add1} onChangeText={setAddress1}></TextInput>
             <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Address Line 2" defaultValue={route.params.myChits[0].Add2} onChangeText={setAddress2}></TextInput>
             <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Address Line 3" defaultValue={route.params.myChits[0].Add3} onChangeText={setAddress3}></TextInput>
             <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>
-            
-            {/* <Text style={[styles.message, { color: 'white' }]}>{message}</Text> */}
             <TouchableOpacity style={styles.button} onPress={addScheme}>
               <Text style={styles.buttonText}>Proceed</Text>
             </TouchableOpacity>
           </View>
+          <Text style={styles.notes}>
+          Bonus Details{"\n"}
+CASH{"\n"}
+Free Gift + 1 Month Bonus at the end of scheme{"\n"}
+GOLD{"\n"}
+Free Gift + No MC, No VA (Wastage) on accumulated weight at the end of scheme{"\n"}
+Terms & Conditions{"\n"}
+Only ONE instalment per month{"\n"}
+Scheme maturity ONE month after end of scheme{"\n"}
+No Cash/Coins will be given for Bonus scheme{"\n"}
+ONE instalment will be deducted if discontinued{"\n"}
+No CASH for GOLD scheme{"\n"}
+GST Applicable{"\n"}
+          </Text>
         </View>
       </ScrollView>
     </ImageBackground>
@@ -153,20 +176,29 @@ const styles = StyleSheet.create({
     paddingBottom: '5%',
   },
   inputs: {
-      width: '100%',
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingTop: '10%',
-  },
-  input: {
-      width: '80%',
-      borderBottomWidth: 1,
-      borderBottomColor: 'white',
-      fontWeight: 'bold',
-      fontSize: 16,
-      color: 'white',
-  },
+    width: '100%',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: '10%',
+},
+notes: {
+  // width: '80%',
+  // borderBottomWidth: 1,
+  // borderBottomColor: 'white',
+  fontSize: 10,
+  color: 'black',
+  fontStyle: 'italic',
+  marginTop: '10px',
+
+},
+input: {
+    width: '80%',
+    borderBottomWidth: 1,
+    borderBottomColor: 'white',
+    fontSize: 16,
+    color: 'white',
+},
   button: {
     width: '40%',
     backgroundColor: 'white',
@@ -174,6 +206,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: '10px'
   },
   buttonText: {
       color: 'red',

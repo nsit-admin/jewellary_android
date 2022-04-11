@@ -40,7 +40,7 @@ export default function App() {
           <NavigationContainer ref={navigationRef}>
             <Stack.Navigator>
               <Stack.Screen name="Sign In" component={AuthScreen} options={{ headerShown:false }} />
-              <Stack.Screen name="Your Existing Chits" component={MyChitsScreen} options={optionsWithoutBackButton} />
+              <Stack.Screen name="Guru Hasti Chit Details" component={MyChitsScreen} options={optionsWithoutBackButton} />
               <Stack.Screen name="Add Scheme" component={AddSchemeScreen} options={options} />
             </Stack.Navigator>
           </NavigationContainer>

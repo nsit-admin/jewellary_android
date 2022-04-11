@@ -191,7 +191,7 @@ const AuthScreen = () => {
                         showAlert(jsonRes.message);
                     } else {
                         if (screenType === 'SignIn') {
-                            navigation.navigate('Your Existing Chits', { mobileNumber });
+                            navigation.navigate('Guru Hasti Chit Details', { mobileNumber });
                         } else {
                             setIsError(false);
                             // setMessage(jsonRes.message);
@@ -251,9 +251,12 @@ const AuthScreen = () => {
                 {screenType === 'forgotPassword' && <Text style={styles.welcomeText}>Forgot Password</Text>}
                 <View style={styles.form}>
                     <View style={styles.inputs}>
-                        <TextInput style={styles.input} editable='{isOtpSent}' placeholderTextColor='white' placeholder='Mobile No' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber} editable={!isOtpSent}></TextInput>
-
-                        {screenType === 'SignIn' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.prefix}>+91</Text>
+                            {<TextInput style={styles.input} editable='{isOtpSent}' placeholderTextColor='white' placeholder='Mobile Number' keyboardType="number-pad" maxLength={10} autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber} editable={!isOtpSent}></TextInput>}
+                        </View>
+                        {screenType === 'SignIn' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white'
+                            placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
 
                         {screenType === 'SignUpNew' && isOtpSent && !isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Otp" value={otp} onChangeText={setOtp}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Name" value={customerName} onChangeText={setCustomerName}></TextInput>}
@@ -336,18 +339,32 @@ const styles = StyleSheet.create({
         textAlign: 'center', // <-- the magic
         fontWeight: 'bold',
         fontSize: 18,
-        marginTop: '2%',
+        marginTop: '15%',
         marginBottom: 0,
         // width: auto,
         color: 'white',
         // backgroundColor: 'yellow',
+    },
+    inputContainer: {
+        // borderWidth: 1,
+        flexDirection: 'row',
+        width: '100%',
+        // alignItems: 'center',
+        // backgroundColor: 'white',
+        marginHorizontal: 10,
+        // borderRadius: 10
+    },
+    prefix: {
+        paddingHorizontal: 10,
+        // fontWeight: 'bold',
+        color: 'white'
     },
     welcomeText: {
         fontSize: 15,
         fontWeight: 'bold',
         margin: '7%',
         // marginLeft: '30%',
-        marginTop: '20%',
+        marginTop: '5%',
         // marginBottom: '30%',
         color: 'white',
     },
@@ -376,11 +393,7 @@ const styles = StyleSheet.create({
         width: '80%',
         borderBottomWidth: 1,
         borderBottomColor: 'white',
-        // paddingTop: '1%',
         fontSize: 16,
-        fontWeight: 'bold',
-        // fontStyle: 'italic',
-        // minHeight: 40,
         color: 'white',
     },
     button: {
