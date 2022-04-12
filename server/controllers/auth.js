@@ -228,7 +228,7 @@ const schemes = (req, res, next) => {
     Chits.findAll({
         where: {
             MobileNo: req.query.mobileNumber,
-            [Op.or]: [{setno: null}, {setno: 0}]
+            [Op.or]: [{ setno: null }, { setno: 0 }]
         }
     })
         .then((chits) => {
@@ -312,9 +312,8 @@ const sendSms = (mobileNumber) => {
 
 
 const sendOtpMsg = (mobileNumber, otp) => {
-    axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&
-    Message=${otp}%20is%20your%20one%20time%20password%20for%20your%20phone%20verification%20with%20GURU%20HASTI%20THANGA%20MAALIGAI&MobileNumbers=${mobileNumber}
-    %2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
+    console.log(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&Message=${otp}%20is%20your%20one%20time%20password%20for%20your%20phone%20verification%20with%20GURU%20HASTI%20THANGA%20MAALIGAI&MobileNumbers=${mobileNumber}%2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`)
+    axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&Message=${otp}%20is%20your%20one%20time%20password%20for%20your%20phone%20verification%20with%20GURU%20HASTI%20THANGA%20MAALIGAI&MobileNumbers=${mobileNumber}%2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
     console.log("sent the smsg");
 }
 
@@ -379,6 +378,7 @@ const verifyOtp = (req, res, next) => {
             otp_code: req.body.otp
         }
     }).then((otpp) => {
+        console.log(otpp)
         if (otpp) {
 
             OTP.update({
@@ -400,7 +400,7 @@ const verifyOtp = (req, res, next) => {
                 }
             }
         } else {
-            return res.status(200).json({ message: 'Entered OTP is not valid. Please enter the right one' });
+            return res.status(401).json({ message: 'Entered OTP is not valid. Please enter the right one' });
         }
     })
 }

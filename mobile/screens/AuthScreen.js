@@ -4,6 +4,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 
 // const API_URL = Platform.OS === 'ios' ? 'http://localhost:5000' : 'http://10.0.2.2:5000';
 const API_URL = 'http://65.1.124.220:5000/api';
+// const API_URL = 'http://localhost:5000/api';
 
 const AuthScreen = () => {
 
@@ -101,6 +102,9 @@ const AuthScreen = () => {
                             showAlert('There was a problem. Please try again later.');
                         } else {
                             setIsOtpVerified(true);
+                            if (screenType === 'SignIn') {
+                                navigation.navigate('Guru Hasti Chit Details', { mobileNumber, isStoreLogin: false });
+                            }
                         }
                     } catch (err) {
                         setIsError(true);
@@ -190,8 +194,8 @@ const AuthScreen = () => {
                         // setMessage(jsonRes.message);
                         showAlert(jsonRes.message);
                     } else {
-                        if (screenType === 'SignIn') {
-                            navigation.navigate('Guru Hasti Chit Details', { mobileNumber });
+                        if (screenType === 'StoreLogin') {
+                            navigation.navigate('Guru Hasti Chit Details', { mobileNumber, isStoreLogin: true });
                         } else {
                             setIsError(false);
                             // setMessage(jsonRes.message);
@@ -208,13 +212,11 @@ const AuthScreen = () => {
             .catch(err => {
                 console.log(err);
                 setIsError(true);
-                // setMessage('There was a problem. Please try again later.');
                 showAlert('There was a problem. Please try again later.');
             });
     };
 
     const screenTypeHandler = (screenType) => {
-        // setMessage('');
         setMobileNumber('');
         setOtp('');
         setPassword('');
@@ -242,23 +244,25 @@ const AuthScreen = () => {
     return (
         <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
             <ScrollView style={styles.card}>
-                {(screenType === 'SignIn' || screenType === 'forgotPassword') && <Text style={styles.headline}>Guru Hasti Thanga Maaliai</Text>}
-                {screenType === 'SignIn' && <Text style={styles.subheadline}>Welcome to Chit Online Payment System</Text>}
+                {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Text style={styles.headline}>Guru Hasti Thanga Maaliai</Text>}
+                {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Text style={styles.subheadline}>Welcome to Chit Online Payment System</Text>}
                 {screenType === 'SignUpExisting' && <Text style={styles.welcomeText}>Kindly provide registered phone number and last receipt number</Text>}
                 {screenType === 'SignUpNew' && <Text style={styles.welcomeText}>Kindly provide all the below details to complete your new registration</Text>}
-                {screenType === 'SignIn' && <Image style={styles.logo} source={require('../public/images/Guruhasti-Thangamaligai.png')} />}
+                {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Image style={styles.logo} source={require('../public/images/Guruhasti-Thangamaligai.png')} />}
                 {(screenType === 'SignUpNew' || screenType === 'SignUpExisting') && <Text style={styles.heading}>Sign Up</Text>}
-                {screenType === 'forgotPassword' && <Text style={styles.welcomeText}>Forgot Password</Text>}
+                {/* {screenType === 'forgotPassword' && <Text style={styles.welcomeText}>Forgot Password</Text>} */}
                 <View style={styles.form}>
                     <View style={styles.inputs}>
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.prefix}>+91</Text>
-                            {<TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile Number' keyboardType="number-pad" maxLength={10} autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber} editable={!isOtpSent}></TextInput>}
-                        </View>
-                        {screenType === 'SignIn' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white'
-                            placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
+                        {
+                            <View style={styles.inputContainer}>
+                                <Text style={styles.prefix}>+91</Text>
+                                {<TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile Number' keyboardType="number-pad" maxLength={10} autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber} editable={!isOtpSent}></TextInput>}
+                            </View>}
+                        {screenType === 'StoreLogin' &&
+                            <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white'
+                                placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
 
-                        {screenType === 'SignUpNew' && isOtpSent && !isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Otp" value={otp} onChangeText={setOtp}></TextInput>}
+                        {(screenType === 'SignUpNew' || screenType === 'SignIn') && isOtpSent && !isOtpVerified && <TextInput style={styles.input} secureTextEntry={true} placeholderTextColor='white' placeholder="Otp" value={otp} onChangeText={setOtp}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Name" value={customerName} onChangeText={setCustomerName}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>}
@@ -266,35 +270,47 @@ const AuthScreen = () => {
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
 
-                        {(screenType === 'SignUpExisting' || screenType === 'forgotPassword') && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Last Receipt No" value={receiptNo} onChangeText={setReceiptNo}></TextInput>}
-                        {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
-                        {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
+                        {(screenType === 'SignUpExisting') && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Last Receipt No" value={receiptNo} onChangeText={setReceiptNo}></TextInput>}
+                        {/* {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>} */}
+                        {/* {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>} */}
 
                         <Text style={[styles.message, { color: 'white' }]}>{message ? getMessage() : null}</Text>
                         {screenType === 'SignUpNew' &&
                             <TouchableOpacity style={styles.button} onPress={isOtpVerified ? onSubmitHandler : otpHandler}>
                                 {isOtpVerified && <Text style={styles.buttonText}>{'Register'}</Text>}
-                                {!isOtpVerified && <Text style={styles.buttonText}>{isOtpSent ? 'Verify Phone' : 'Send OTP'}</Text>}
+                                {!isOtpVerified && <Text style={styles.buttonText}>{isOtpSent ? 'Verify Phone' : 'Get OTP'}</Text>}
                             </TouchableOpacity>
                         }
-                        {(screenType === 'SignIn' || screenType === 'SignUpExisting') && (!isOtpSent || !isOtpVerified) &&
+                        {screenType === 'SignIn' &&
+                            <TouchableOpacity style={styles.button} onPress={isOtpVerified ? onSubmitHandler : otpHandler}>
+                                {/* {isOtpVerified && <Text style={styles.buttonText}>{'Register'}</Text>} */}
+                                {!isOtpVerified && <Text style={styles.buttonText}>{isOtpSent ? 'Login' : 'Get OTP'}</Text>}
+                            </TouchableOpacity>
+                        }
+                        {screenType === 'StoreLogin' &&
                             <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
-                                {screenType === 'SignIn' && <Text style={styles.buttonText}>{'Sign In'}</Text>}
+                                {/* {isOtpVerified && <Text style={styles.buttonText}>{'Register'}</Text>} */}
+                                {<Text style={styles.buttonText}>{'Login'}</Text>}
+                            </TouchableOpacity>
+                        }
+                        {(screenType === 'SignUpExisting') && (!isOtpSent || !isOtpVerified) &&
+                            <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
+                                {/* {screenType === 'SignIn' && <Text style={styles.buttonText}>{'Login'}</Text>} */}
                                 {screenType === 'SignUpExisting' && <Text style={styles.buttonText}>{'Register'}</Text>}
                             </TouchableOpacity>
                         }
-                        {(screenType === 'forgotPassword') &&
+                        {/* {(screenType === 'forgotPassword') &&
                             <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
                                 {screenType === 'forgotPassword' && <Text style={styles.buttonText}>{'Send Password'}</Text>}
                             </TouchableOpacity>
-                        }
-                        {screenType === 'SignIn' && <Text style={styles.linkText} onPress={() => { screenTypeHandler('forgotPassword') }}>Forgot Password</Text>}
+                        } */}
+                        {screenType === 'SignIn' && <Text style={styles.linkText} onPress={() => { screenTypeHandler('StoreLogin') }}>Store Login</Text>}
                         {screenType === 'SignIn' &&
                             <>
-                                <Text style={styles.buttonAlt}>
+                                {/* <Text style={styles.buttonAlt}>
                                     <Text style={styles.normalText}>If you are an existing customer with GHT, please </Text>
                                     <Text style={styles.linkText} onPress={() => { screenTypeHandler('SignUpExisting') }}>click here</Text>
-                                </Text>
+                                </Text> */}
                                 <Text style={styles.buttonAlt}>
                                     <Text style={styles.normalText}>If you are a new customer to GHT and would like to register, please </Text>
                                     <Text style={styles.linkText} onPress={() => { screenTypeHandler('SignUpNew') }}>click here</Text>
@@ -364,7 +380,7 @@ const styles = StyleSheet.create({
         // borderRadius: 10
     },
     prefix: {
-        marginTop: 13,
+        marginTop: 13.5,
         marginLeft: '6%',
         // fontWeight: 'bold',
         color: 'white',

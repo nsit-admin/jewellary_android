@@ -8,6 +8,9 @@ const API_URL = 'http://65.1.124.220:5000/api';
 const MyChitsScreen = () => {
 
   const [myChits, setMyChits] = useState([]);
+  const [storeLogin, setStoreLogin] = useState(false);
+  const [viewChits, setViewChits] = useState(false);
+  const [customerPhone, setCustomerPhone] = useState('');
 
   const route = useRoute();
   const navigation = useNavigation();
@@ -15,17 +18,23 @@ const MyChitsScreen = () => {
 
 
   useEffect(() => {
-    if (myChits.length === 0 || route.params.reload) {
-      getMySchemes();
+    if (myChits.length === 0 || route.params.reload || !storeLogin) {
+      // getMySchemes();
       route.params.reload = false;
     }
+    setStoreLogin(route.params.isStoreLogin);
   });
 
   const getDueDate = (val) => {
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const d = val ? new Date(val) : new Date();
-    console.log("dude => ", months[d.getMonth()] + " " + d.getFullYear())
-    return months[d.getMonth()] + " " + d.getFullYear(); 
+    // console.log("dude => ", months[d.getMonth()] + " " + d.getFullYear())
+    var month = d.getMonth();
+    if (month === 11) {
+      return months[d.getMonth()] + " " + d.getFullYear() + 1;
+    } else {
+      return months[d.getMonth() + 1] + " " + d.getFullYear();
+    };
   }
 
   const getDate = (date) => {
@@ -42,6 +51,28 @@ const MyChitsScreen = () => {
       method: 'GET',
     })
       .then(async res => {
+        try {
+          const jsonRes = await res.json();
+          if (res.status === 200 && jsonRes.records && jsonRes.records.length > 0) {
+            setMyChits(jsonRes.records);
+          }
+        } catch (err) {
+          console.log(err);
+        };
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  const getCustomerSchemes = () => {
+    console.log(customerPhone);
+    // setMakeApiCall(true);
+    fetch(`${API_URL}/schemes?mobileNumber=${customerPhone}`, {
+      method: 'GET',
+    })
+      .then(async res => {
+        setViewChits(true);
         try {
           const jsonRes = await res.json();
           if (res.status === 200 && jsonRes.records && jsonRes.records.length > 0) {
@@ -79,7 +110,7 @@ const MyChitsScreen = () => {
         try {
           const jsonRes = await res.json();
           if (res.status === 200) {
-            
+
           }
         } catch (err) {
           console.log(err);
@@ -92,58 +123,74 @@ const MyChitsScreen = () => {
 
   return (
     <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
-      <View style={styles.chits}>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={styles.heading}>Your Existing Chits</Text>
-          <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
-            <Text style={styles.addSchemeText}>Add Scheme</Text>
-          </TouchableOpacity>
+      {storeLogin && !viewChits &&
+        <View style={styles.form}>
+
+          <View style={styles.inputs}>
+            {/* <View style={{ flexDirection: 'row' }}> */}
+            <Text style={styles.heading}>Get the customer details</Text>
+            <TextInput style={styles.input} placeholderTextColor='white' maxLength={10}
+              placeholder="Customer Phone Number" value={customerPhone} onChangeText={setCustomerPhone}></TextInput>
+            <TouchableOpacity style={styles.addScheme} onPress={() => { getCustomerSchemes() }}>
+              <Text style={styles.buttonText}>Fetch Customer Details</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <FlatList
-          keyExtractor={(item, index) => index.toString()}
-          data={myChits}
-          renderItem={({ item, index }) => (
-            <ListItem.Accordion key={index}
-              style={{ backgroundColor: 'transparent' }}
-              theme={{ colors: { primary: '#fff' } }}
-              // icon={<><Icon name='chevron-down' type='font-awesome' size={20} color={'white'} /></>}
-              content={
-                <>
-                  <Icon name='money' type='font-awesome' size={20} color={'white'} />
-                  <ListItem.Content>
-                    <ListItem.Title style={{ color: 'white', fontWeight: 'bold' }}>  Chit Number - {item.chits.yrtrno}</ListItem.Title>
-                    {/* <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle> */}
-                  </ListItem.Content>
-                </>
-              }
-              isExpanded={expanded === item.chits.yrtrno}
-              onPress={() => {
-                setExpanded(expanded === item.chits.yrtrno ? '' : item.chits.yrtrno);
-              }}
-            >
-              <View style={styles.chitDetails}>
-                <ListItem theme={{ colors: { primary: '#fff' } }}>
-                  <ListItem.Content>
-                    <ListItem.Title style={{ color: 'white' }}>Name: {item.chits.CustName}</ListItem.Title>
-                    <ListItem.Title style={{ color: 'white' }}>Last Inst Paid: {item.receipts.length ? item.receipts[0].InstNo : '-'}/11</ListItem.Title>
-                    <ListItem.Title style={{ color: 'white' }}>Last Inst Date: {getDate(item.receipts.length ? item.receipts[0].TrDate: new Date())} Rs:{item.receipts.InstAmt} /-</ListItem.Title>
-                    <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Current Due: {getDueDate(item.receipts.length ? item.receipts[0].TrDate: new Date())} - {item.InstAmt ? item.InstAmt : '-'}</ListItem.Subtitle>
-                  </ListItem.Content>
-                </ListItem>
-                {Math.floor((new Date().getTime() - new Date(item.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30 &&
+      }
+      {(!storeLogin || viewChits) &&
+        <View style={styles.chits}>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={styles.heading}>Your Existing Chits</Text>
+            <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
+              <Text style={styles.addSchemeText}>Add Scheme</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            keyExtractor={(item, index) => index.toString()}
+            data={myChits}
+            renderItem={({ item, index }) => (
+              <ListItem.Accordion key={index}
+                style={{ backgroundColor: 'transparent' }}
+                theme={{ colors: { primary: '#fff' } }}
+                // icon={<><Icon name='chevron-down' type='font-awesome' size={20} color={'white'} /></>}
+                content={
+                  <>
+                    <Icon name='money' type='font-awesome' size={20} color={'white'} />
+                    <ListItem.Content>
+                      <ListItem.Title style={{ color: 'white', fontWeight: 'bold' }}>  Chit Number - {item.chits.yrtrno}</ListItem.Title>
+                      {/* <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle> */}
+                    </ListItem.Content>
+                  </>
+                }
+                isExpanded={expanded === item.chits.yrtrno}
+                onPress={() => {
+                  setExpanded(expanded === item.chits.yrtrno ? '' : item.chits.yrtrno);
+                }}
+              >
+                <View style={styles.chitDetails}>
                   <ListItem theme={{ colors: { primary: '#fff' } }}>
                     <ListItem.Content>
-                      <TouchableOpacity style={styles.button} onPress={() => { payDueHandler(item) }}>
-                        <Text style={styles.buttonText}>Pay</Text>
-                      </TouchableOpacity>
+                      <ListItem.Title style={{ color: 'white' }}>Name: {item.chits.CustName}</ListItem.Title>
+                      <ListItem.Title style={{ color: 'white' }}>Last Inst Paid: {item.receipts.length ? item.receipts[0].InstNo : '-'}/11</ListItem.Title>
+                      <ListItem.Title style={{ color: 'white' }}>Last Inst Date: {getDate(item.receipts.length ? item.receipts[0].TrDate : new Date())} Rs:{item.receipts[0].InstAmt} /-</ListItem.Title>
+                      <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Current Due: {getDueDate(item.chits.TrDate ? item.chits.TrDate : new Date())} - {item.chits.InstAmt ? item.chits.InstAmt : '-'}</ListItem.Subtitle>
                     </ListItem.Content>
                   </ListItem>
-                }
-              </View>
-            </ListItem.Accordion>
-          )}
-        />
-      </View>
+                  {Math.floor((new Date().getTime() - new Date(item.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30 &&
+                    <ListItem theme={{ colors: { primary: '#fff' } }}>
+                      <ListItem.Content>
+                        <TouchableOpacity style={styles.button} onPress={() => { payDueHandler(item) }}>
+                          <Text style={styles.buttonText}>Pay</Text>
+                        </TouchableOpacity>
+                      </ListItem.Content>
+                    </ListItem>
+                  }
+                </View>
+              </ListItem.Accordion>
+            )}
+          />
+        </View>
+      }
     </ImageBackground>
   );
 };
@@ -186,6 +233,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: '5%',
     marginLeft: '20%',
+  },
+  form: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: '5%',
+  },
+  inputs: {
+    width: '100%',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: '10%',
+  },
+  input: {
+    // width: '80%',
+    borderBottomWidth: 1,
+    borderBottomColor: 'white',
+    fontSize: 16,
+    color: 'white',
   },
   addSchemeText: {
     color: 'red',
