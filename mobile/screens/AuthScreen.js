@@ -357,16 +357,20 @@ const styles = StyleSheet.create({
     inputContainer: {
         // borderWidth: 1,
         flexDirection: 'row',
-        width: '100%',
+        width: '90%',
         // alignItems: 'center',
         // backgroundColor: 'white',
-        marginHorizontal: 10,
+        // marginHorizontal: 10,
         // borderRadius: 10
     },
     prefix: {
-        paddingHorizontal: 10,
+        marginTop: 13,
+        marginLeft: '6%',
         // fontWeight: 'bold',
-        color: 'white'
+        color: 'white',
+        borderBottomWidth: 1,
+        borderBottomColor: 'white',
+        fontSize: 16,
     },
     welcomeText: {
         fontSize: 15,
