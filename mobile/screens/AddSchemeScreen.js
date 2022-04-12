@@ -121,12 +121,12 @@ const AddSchemeScreen = () => {
                 <Text style={styles.radioButtonText}>Metal</Text>
               </View>
             </RadioButton.Group>
-            <TextInput style={styles.input} editable = '{isEditable}' placeholderTextColor='white' placeholder='Mobile Number' autoCapitalize='none' value={route.params.myChits[0].MobileNo} onChangeText={setMobileNumber}></TextInput>
-            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Customer Name" defaultValue={route.params.myChits[0].CustName} onChangeText={setCustomerName}></TextInput>
-            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Address Line 1" defaultValue={route.params.myChits[0].Add1} onChangeText={setAddress1}></TextInput>
-            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Address Line 2" defaultValue={route.params.myChits[0].Add2} onChangeText={setAddress2}></TextInput>
-            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Address Line 3" defaultValue={route.params.myChits[0].Add3} onChangeText={setAddress3}></TextInput>
-            <TextInput style={styles.input} editable = '{!isEditable}' placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>
+            <TextInput style={styles.input} editable={isEditable} placeholderTextColor='white' placeholder='Mobile Number' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
+            <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Customer Name" value={customerName} onChangeText={setCustomerName}></TextInput>
+            <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>
+            <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>
+            <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Address Line 3" value={address3} onChangeText={setAddress3}></TextInput>
+            <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>
             <TouchableOpacity style={styles.button} onPress={addScheme}>
               <Text style={styles.buttonText}>Proceed</Text>
             </TouchableOpacity>
@@ -189,7 +189,7 @@ notes: {
   fontSize: 10,
   color: 'black',
   fontStyle: 'italic',
-  marginTop: '10px',
+  marginTop: 10,
 
 },
 input: {
@@ -206,7 +206,7 @@ input: {
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '10px'
+    marginTop: 10,
   },
   buttonText: {
       color: 'red',

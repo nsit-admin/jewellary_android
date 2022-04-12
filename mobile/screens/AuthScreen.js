@@ -243,7 +243,7 @@ const AuthScreen = () => {
         <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
             <ScrollView style={styles.card}>
                 {(screenType === 'SignIn' || screenType === 'forgotPassword') && <Text style={styles.headline}>Guru Hasti Thanga Maaliai</Text>}
-                {screenType === 'SignIn' && <Text style={styles.welcomeText}>Welcome to Chit Online Payment System</Text>}
+                {screenType === 'SignIn' && <Text style={styles.subheadline}>Welcome to Chit Online Payment System</Text>}
                 {screenType === 'SignUpExisting' && <Text style={styles.welcomeText}>Kindly provide registered phone number and last receipt number</Text>}
                 {screenType === 'SignUpNew' && <Text style={styles.welcomeText}>Kindly provide all the below details to complete your new registration</Text>}
                 {screenType === 'SignIn' && <Image style={styles.logo} source={require('../public/images/Guruhasti-Thangamaligai.png')} />}
@@ -253,7 +253,7 @@ const AuthScreen = () => {
                     <View style={styles.inputs}>
                         <View style={styles.inputContainer}>
                             <Text style={styles.prefix}>+91</Text>
-                            {<TextInput style={styles.input} editable='{isOtpSent}' placeholderTextColor='white' placeholder='Mobile Number' keyboardType="number-pad" maxLength={10} autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber} editable={!isOtpSent}></TextInput>}
+                            {<TextInput style={styles.input} placeholderTextColor='white' placeholder='Mobile Number' keyboardType="number-pad" maxLength={10} autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber} editable={!isOtpSent}></TextInput>}
                         </View>
                         {screenType === 'SignIn' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white'
                             placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
@@ -332,8 +332,8 @@ const styles = StyleSheet.create({
     },
     logo: {
         margin: '30%',
-        marginTop: '5%',
-        marginBottom: '1%',
+        marginTop: '2%',
+        marginBottom: 0,
     },
     headline: {
         textAlign: 'center', // <-- the magic
@@ -344,6 +344,15 @@ const styles = StyleSheet.create({
         // width: auto,
         color: 'white',
         // backgroundColor: 'yellow',
+    },
+    subheadline: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        margin: '7%',
+        // marginLeft: '30%',
+        marginTop: '3%',
+        // marginBottom: '30%',
+        color: 'white',
     },
     inputContainer: {
         // borderWidth: 1,
@@ -364,7 +373,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         margin: '7%',
         // marginLeft: '30%',
-        marginTop: '5%',
+        marginTop: '20%',
         // marginBottom: '30%',
         color: 'white',
     },
@@ -442,7 +451,7 @@ const styles = StyleSheet.create({
     },
     message: {
         fontSize: 16,
-        marginVertical: '5%',
+        marginVertical: '1%',
     },
 
 });
