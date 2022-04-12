@@ -12,9 +12,7 @@ const MyChitsScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const d = new Date();
-  let monthName = months[d.getMonth()]
+
 
   useEffect(() => {
     if (myChits.length === 0 || route.params.reload) {
@@ -23,25 +21,39 @@ const MyChitsScreen = () => {
     }
   });
 
+  const getDueDate = (val) => {
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const d = val ? new Date(val) : new Date();
+    console.log("dude => ", months[d.getMonth()] + " " + d.getFullYear())
+    return months[d.getMonth()] + " " + d.getFullYear(); 
+  }
+
+  const getDate = (date) => {
+    console.log('date', date)
+    const d = date ? new Date(date) : new Date();
+    console.log("get dat =>", d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear())
+    return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+  }
+
   const [expanded, setExpanded] = useState('');
 
   const getMySchemes = () => {
     fetch(`${API_URL}/schemes?mobileNumber=${route.params.mobileNumber}`, {
-        method: 'GET',
+      method: 'GET',
     })
-    .then(async res => { 
+      .then(async res => {
         try {
-            const jsonRes = await res.json();
-            if (res.status === 200 && jsonRes.chits && jsonRes.chits.length > 0) {
-              setMyChits(jsonRes.chits);
-            }
+          const jsonRes = await res.json();
+          if (res.status === 200 && jsonRes.records && jsonRes.records.length > 0) {
+            setMyChits(jsonRes.records);
+          }
         } catch (err) {
-            console.log(err);
+          console.log(err);
         };
-    })
-    .catch(err => {
+      })
+      .catch(err => {
         console.log(err);
-    });
+      });
   };
 
   const addSchemeHandler = () => {
@@ -57,32 +69,32 @@ const MyChitsScreen = () => {
     //   instno: Number(item.InstPaid) + 1,
     // };
     fetch(`${API_URL}/payment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(item),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(item),
     })
-    .then(async res => { 
+      .then(async res => {
         try {
-            const jsonRes = await res.json();
-            if (res.status === 200) {
-              //
-            }
+          const jsonRes = await res.json();
+          if (res.status === 200) {
+            
+          }
         } catch (err) {
-            console.log(err);
+          console.log(err);
         };
-    })
-    .catch(err => {
+      })
+      .catch(err => {
         console.log(err);
-    });
+      });
   };
 
   return (
     <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
       <View style={styles.chits}>
-        <View style={{flexDirection: 'row'}}>
-          <Text style={styles.heading}>Guru Hasti Chits</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={styles.heading}>Your Existing Chits</Text>
           <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
             <Text style={styles.addSchemeText}>Add Scheme</Text>
           </TouchableOpacity>
@@ -90,44 +102,45 @@ const MyChitsScreen = () => {
         <FlatList
           keyExtractor={(item, index) => index.toString()}
           data={myChits}
-          renderItem= {({ item, index }) => (
-              <ListItem.Accordion key={index}
-                style={{ backgroundColor: 'transparent'}}
-                theme={{ colors: {primary: '#fff'} }}
-                // icon={<><Icon name='chevron-down' type='font-awesome' size={20} color={'white'} /></>}
-                content={
-                  <>
-                    <Icon name='money' type='font-awesome' size={20} color={'white'} />
+          renderItem={({ item, index }) => (
+            <ListItem.Accordion key={index}
+              style={{ backgroundColor: 'transparent' }}
+              theme={{ colors: { primary: '#fff' } }}
+              // icon={<><Icon name='chevron-down' type='font-awesome' size={20} color={'white'} /></>}
+              content={
+                <>
+                  <Icon name='money' type='font-awesome' size={20} color={'white'} />
+                  <ListItem.Content>
+                    <ListItem.Title style={{ color: 'white', fontWeight: 'bold' }}>  Chit Number - {item.chits.yrtrno}</ListItem.Title>
+                    {/* <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle> */}
+                  </ListItem.Content>
+                </>
+              }
+              isExpanded={expanded === item.chits.yrtrno}
+              onPress={() => {
+                setExpanded(expanded === item.chits.yrtrno ? '' : item.chits.yrtrno);
+              }}
+            >
+              <View style={styles.chitDetails}>
+                <ListItem theme={{ colors: { primary: '#fff' } }}>
+                  <ListItem.Content>
+                    <ListItem.Title style={{ color: 'white' }}>Name: {item.chits.CustName}</ListItem.Title>
+                    <ListItem.Title style={{ color: 'white' }}>Last Inst Paid: {item.receipts.length ? item.receipts[0].InstNo : '-'}/11</ListItem.Title>
+                    <ListItem.Title style={{ color: 'white' }}>Last Inst Date: {getDate(item.receipts.length ? item.receipts[0].TrDate: new Date())} Rs:{item.receipts.InstAmt} /-</ListItem.Title>
+                    <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Current Due: {getDueDate(item.receipts.length ? item.receipts[0].TrDate: new Date())} - {item.InstAmt ? item.InstAmt : '-'}</ListItem.Subtitle>
+                  </ListItem.Content>
+                </ListItem>
+                {Math.floor((new Date().getTime() - new Date(item.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30 &&
+                  <ListItem theme={{ colors: { primary: '#fff' } }}>
                     <ListItem.Content>
-                      <ListItem.Title style={{color: 'white', fontWeight: 'bold'}}>  Chit Number - {item.yrtrno}</ListItem.Title>
-                      {/* <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle> */}
-                    </ListItem.Content>
-                  </>
-                }
-                isExpanded={expanded === item.yrtrno}
-                onPress={() => {
-                  setExpanded(expanded === item.yrtrno ? '' : item.yrtrno);
-                }}
-              >
-                <View style={styles.chitDetails}>
-                  <ListItem theme={{ colors: {primary: '#fff'} }}>
-                    <ListItem.Content>
-                      <ListItem.Title style={{color: 'white'}}>Name: {item.CustName}</ListItem.Title>
-                      <ListItem.Title style={{color: 'white'}}>Last Inst Paid: {item.InstAmt}</ListItem.Title>
-                      <ListItem.Subtitle style={{color: 'white', fontWeight: 'bold'}}>Current Due: {monthName.toUpperCase()} 2022 - {item.InstAmt ? item.InstAmt : '-'}</ListItem.Subtitle>
+                      <TouchableOpacity style={styles.button} onPress={() => { payDueHandler(item) }}>
+                        <Text style={styles.buttonText}>Pay</Text>
+                      </TouchableOpacity>
                     </ListItem.Content>
                   </ListItem>
-                  {Math.floor((new Date().getTime() - new Date(item.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30 && 
-                    <ListItem theme={{ colors: {primary: '#fff'} }}>
-                      <ListItem.Content>
-                          <TouchableOpacity style={styles.button} onPress={() => { payDueHandler(item) }}>
-                              <Text style={styles.buttonText}>Pay</Text>
-                          </TouchableOpacity>
-                      </ListItem.Content>
-                    </ListItem>
-                  }
-                </View>
-              </ListItem.Accordion>
+                }
+              </View>
+            </ListItem.Accordion>
           )}
         />
       </View>
@@ -140,7 +153,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     alignItems: 'center',
-  }, 
+  },
   chits: {
     flex: 1,
     width: '80%',
@@ -159,9 +172,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-      color: 'red',
-      fontSize: 16,
-      fontWeight: '600',
+    color: 'red',
+    fontSize: 16,
+    fontWeight: '600',
   },
   addScheme: {
     // width: '35%',

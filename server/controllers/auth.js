@@ -9,6 +9,7 @@ import CustomerCreds from '../models/customer_creds.js'; 4
 import CustMaster from '../models/custmast.js';
 import OTP from '../models/otp.js';
 import sequelize from '../utils/database.js';
+import { Op } from 'sequelize';
 
 
 const signupExisting = (req, res, next) => {
@@ -201,11 +202,11 @@ const payment = (req, res, next) => {
                             trno: parseInt(pk) + 1,
                             yrtrno: req.body.yrtrno,
                             chitno: req.body.trno,
-                            trdate: '',
+                            trdate: dateFormat(new Date(), "yyyy-mm-dd h:MM:ss"),
                             instno: req.body.instno,
                             rate: '', // TODO - GEt it from other table during insertion
                             wt: '', // TODO - Calculation to be done
-                            datestamp: new Date()
+                            datestamp: dateFormat(new Date(), "yyyy-mm-dd h:MM:ss")
 
                         }).then((ins) => {
                             console.log(ins)
@@ -223,27 +224,35 @@ const payment = (req, res, next) => {
 };
 
 const schemes = (req, res, next) => {
-    let receipts = [];
+    let records = [];
     Chits.findAll({
         where: {
             MobileNo: req.query.mobileNumber,
-            setno: null || 0
-        }
-    }).then((chits) => {
-        if (chits) {
-            chits.forEach((cr) => {
-                ChitRec.findAll({
-                    where: {
-                        chitno: cr.trno
-                    }
-                }).then((rec) => {
-                    cr['receipts'] = rec;
-                    receipts.push(cr);
-                })
-            })
-            res.status(200).json({ chits: chits });
+            [Op.or]: [{setno: null}, {setno: 0}]
         }
     })
+        .then((chits) => {
+            if (chits && chits.length) {
+                chits.forEach((cr, index) => {
+                    let chit = {};
+                    sequelize.query(`SELECT cr.*, max(trdate) FROM ght.chitrec cr where chitno = ${cr.trno}`)
+                        .then((rec) => {
+                            chit['chits'] = cr;
+                            if (rec.length > 0) {
+                                chit['receipts'] = rec[0];
+                            } else {
+                                chit['receipts'] = [];
+                            }
+                            records.push(chit);
+                            if (chits.length === index + 1) {
+                                res.status(200).json({ 'records': records });
+                            }
+                        })
+                })
+            } else {
+                res.status(200).json({ chits: records });
+            }
+        })
 };
 
 const schemesAddition = (req, res, next) => {
@@ -252,7 +261,7 @@ const schemesAddition = (req, res, next) => {
             console.log()
             const pk = val[0][0].pkey
             Chits.create({
-                trDate: new Date(),
+                trDate: dateFormat(new Date(), "yyyy-mm-dd h:MM:ss"),
                 trno: parseInt(pk) + 1,
                 yrtrno: parseInt(pk) + 1,
                 CustName: req.body.customerName,
@@ -260,7 +269,7 @@ const schemesAddition = (req, res, next) => {
                 Add1: req.body.address1,
                 Add2: req.body.address2,
                 Add3: req.body.address3,
-                Stcode: 1,
+                Stcode: req.body.chitType,
                 NoI: 11,
                 instamt: req.body.instamt,
                 bonus: req.body.instamt,
@@ -304,8 +313,7 @@ const sendSms = (mobileNumber) => {
 
 const sendOtpMsg = (mobileNumber, otp) => {
     axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&
-    Message=Thank%20you%20for%20shopping%20%40%20GURU%20HASTI%20THANGA%20MAALIGAI%2C%20POONAMALLEE.%20
-    Please%20Visit%20again%20and%20again%21%20Have%20a%20great%20day%21&MobileNumbers=${mobileNumber}
+    Message=${otp}%20is%20your%20one%20time%20password%20for%20your%20phone%20verification%20with%20GURU%20HASTI%20THANGA%20MAALIGAI&MobileNumbers=${mobileNumber}
     %2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
     console.log("sent the smsg");
 }
@@ -406,9 +414,9 @@ const forgotPassword = (req, res, next) => {
 
                 // send the password thru SMS
 
-                res.status(200).json({message: 'SMS will be sent to the registered phone number'});
+                res.status(200).json({ message: 'SMS will be sent to the registered phone number' });
             } else {
-                res.status(200).json({message: 'SMS will be sent to the registered phone number if the data provided is valid'});
+                res.status(200).json({ message: 'SMS will be sent to the registered phone number if the data provided is valid' });
             }
         })
         .catch(err => {

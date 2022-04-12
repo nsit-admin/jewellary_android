@@ -35,17 +35,33 @@ const AddSchemeScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const chit = route.params.myChits[0];
+    let chit = route.params.myChits[0];
+
+    // if (!chit) {
+    //   chit = getCustomerDetails(route.params.mobileNumber);
+    // } 
+    // console.log(route.params.myChits)
     if(chit && !isDefaultsSet) {
-      setMobileNumber(chit.MobileNo);
-      setCustomerName(chit.CustName);
-      setAddress1(chit.Add1);
-      setAddress2(chit.Add2);
-      setAddress3(chit.Add3);
+      setMobileNumber(chit.chits.MobileNo);
+      setCustomerName(chit.chits.CustName);
+      setAddress1(chit.chits.Add1);
+      setAddress2(chit.chits.Add2);
+      setAddress3(chit.chits.Add3);
       setIsEditable(false);
       setIsDefaultsSet(true);
     }
   })
+
+  const getCustomerDetails = () => {
+    fetch(`${API_URL}/customer?mobileNumber=${route.params.mobileNumber}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+  }).then((res) => {
+    return res;
+  })
+  }
 
   const addScheme = () => {
     if (!customerName || !address1 || !address2 || !address3 || !instamt.value) {
@@ -69,8 +85,7 @@ const AddSchemeScreen = () => {
       address1,
       address2,
       address3,
-      instamt: instamt.value,
-      chitType
+      instamt: instamt.value
     };
     fetch(`${API_URL}/schemes`, {
         method: 'POST',
@@ -113,13 +128,13 @@ const AddSchemeScreen = () => {
                 <RadioButton
                   color='white'
                   uncheckedColor='white'
-                  value="cash"
+                  value="2"
                 />
                 <Text style={styles.radioButtonText}>Cash</Text>
                 <RadioButton
                   color='white'
                   uncheckedColor='white'
-                  value="metal"
+                  value="1"
                 />
                 <Text style={styles.radioButtonText}>Metal</Text>
               </View>
