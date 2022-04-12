@@ -3,6 +3,7 @@ import { ImageBackground, View, ScrollView, Text, StyleSheet, TouchableOpacity, 
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { RadioButton } from 'react-native-paper';
 // import {StyleSheet, View, ScrollView} from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
 
 const API_URL = 'http://65.1.124.220:5000/api';
 
@@ -18,47 +19,49 @@ const AddSchemeScreen = () => {
     { label: 'Plan - 10000', value: '10000' },
   ];
 
-  const [chitType, setChitType] = useState('amount');
+  const [chitType, setChitType] = useState('metal');
   const [mobileNumber, setMobileNumber] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [address1, setAddress1] = useState('');
   const [address2, setAddress2] = useState('');
   const [address3, setAddress3] = useState('');
   const [isEditable, setIsEditable] = useState(true);
-  const [instamt, setInstamt] = useState('');
+  const [instamt, setInstamt] = useState({});
   const [message, setMessage] = useState('');
   const [isFormValid, setIsFormValid] = useState(true);
+  const [isDefaultsSet, setIsDefaultsSet] = useState(false);
 
   const route = useRoute();
   const navigation = useNavigation();
 
   useEffect(() => {
     const chit = route.params.myChits[0];
-    if(chit) {
+    if(chit && !isDefaultsSet) {
       setMobileNumber(chit.MobileNo);
       setCustomerName(chit.CustName);
       setAddress1(chit.Add1);
       setAddress2(chit.Add2);
       setAddress3(chit.Add3);
       setIsEditable(false);
+      setIsDefaultsSet(true);
     }
-
   })
 
   const addScheme = () => {
-    if (!instamt) {
+    if (!customerName || !address1 || !address2 || !address3 || !instamt.value) {
       // if(!message) {
         // setMessage('Kindly provide all the details');
         showAlert('Kindly provide all the details');
       // }
       return;
-    } else {
-      const inpt = isNaN(instamt) ? 0 : Number(instamt);
-      if (inpt < 500 || inpt > 10000 || inpt % 500 != 0) {
-        showAlert('Please enter 500, 1000, 2000, 3000, 4000, 5000 or 10000');
-        return;
-      }
-    }
+    } 
+    // else {
+    //   const inpt = isNaN(instamt) ? 0 : Number(instamt);
+    //   if (inpt < 500 || inpt > 10000 || inpt % 500 != 0) {
+    //     showAlert('Please enter 500, 1000, 2000, 3000, 4000, 5000 or 10000');
+    //     return;
+    //   }
+    // }
     const payload = {
       chitType,
       mobileNumber,
@@ -66,7 +69,7 @@ const AddSchemeScreen = () => {
       address1,
       address2,
       address3,
-      instamt,
+      instamt: instamt.value,
       chitType
     };
     fetch(`${API_URL}/schemes`, {
@@ -106,7 +109,7 @@ const AddSchemeScreen = () => {
           <View style={styles.inputs}>
             <RadioButton.Group onValueChange={setChitType} value={chitType}>
               <View style={{flexDirection: 'row'}}>
-                <Text style={styles.radioButtonText}>Chit Type: </Text>
+                <Text style={styles.radioButtonText}>Savings Type: </Text>
                 <RadioButton
                   color='white'
                   uncheckedColor='white'
@@ -126,7 +129,20 @@ const AddSchemeScreen = () => {
             <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>
             <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>
             <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Address Line 3" value={address3} onChangeText={setAddress3}></TextInput>
-            <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput>
+            {/* <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput> */}
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={{color: 'white'}}
+              selectedTextStyle={{color: 'black'}}
+              selectedTextProps={{style: {color: 'white', fontSize: 16}}}
+              iconStyle={{tintColor: 'white'}}
+              data={instData}
+              labelField="label"
+              valueField="value"
+              placeholder="Installment Amount"
+              value={instamt.value}
+              onChange={setInstamt}
+            />
             <TouchableOpacity style={styles.button} onPress={addScheme}>
               <Text style={styles.buttonText}>Proceed</Text>
             </TouchableOpacity>
@@ -206,7 +222,7 @@ input: {
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
   },
   buttonText: {
       color: 'red',
@@ -238,6 +254,15 @@ input: {
     fontSize: 16,
     color: 'white',
     marginTop: 6,
+  },
+  dropdown: {
+    width: '80%',
+    borderBottomWidth: 1,
+    borderBottomColor: 'white',
+    fontSize: 16,
+    color: 'white',
+    padding: 5,
+    textDecorationColor: 'white',
   }
 });
 
