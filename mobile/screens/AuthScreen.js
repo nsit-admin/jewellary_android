@@ -35,6 +35,7 @@ const AuthScreen = () => {
             setPassword('');
             // setMessage('');
             route.params.logout = false;
+            screenTypeHandler('SignIn');
         }
     });
 
@@ -138,7 +139,7 @@ const AuthScreen = () => {
                 address1,
                 address2,
                 address3,
-                password
+                // password
             };
         } else if (screenType === 'SignUpExisting') {
             if (isOtpVerified) {
@@ -146,14 +147,14 @@ const AuthScreen = () => {
                 payload = {
                     mobileNumber,
                     receiptNo,
-                    password
+                    // password
                 };
             } else {
                 endpoint = '/signup/existing';
                 payload = {
                     mobileNumber,
                     receiptNo,
-                    password
+                    // password
                 };
             }
 
@@ -174,11 +175,12 @@ const AuthScreen = () => {
                 showAlert('Kindly provide all the details');
             }
             return;
-        } else if ((screenType === 'SignUpNew' || screenType === 'SignUpExisting') && password != confirmPassword) {
-            // setMessage('Password and Confirm Password does not match');
-            showAlert('Password and Confirm Password does not match');
-            return;
-        }
+        } 
+        // else if ((screenType === 'SignUpNew' || screenType === 'SignUpExisting') && password != confirmPassword) {
+        //     // setMessage('Password and Confirm Password does not match');
+        //     showAlert('Password and Confirm Password does not match');
+        //     return;
+        // }
         fetch(`${API_URL}${endpoint}`, {
             method: 'POST',
             headers: {
@@ -267,8 +269,8 @@ const AuthScreen = () => {
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>}
                         {screenType === 'SignUpNew' && isOtpVerified && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Address Line 3" value={address3} onChangeText={setAddress3}></TextInput>}
-                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
-                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>}
+                        {/* {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>}
+                        {screenType === 'SignUpNew' && isOtpVerified && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>} */}
 
                         {(screenType === 'SignUpExisting') && <TextInput style={styles.input} placeholderTextColor='white' placeholder="Last Receipt No" value={receiptNo} onChangeText={setReceiptNo}></TextInput>}
                         {/* {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Password" value={password} onChangeText={setPassword}></TextInput>} */}
@@ -380,7 +382,8 @@ const styles = StyleSheet.create({
         // borderRadius: 10
     },
     prefix: {
-        marginTop: 13.5,
+        marginTop: '5%',
+        paddingBottom: '5%',
         marginLeft: '6%',
         // fontWeight: 'bold',
         color: 'white',

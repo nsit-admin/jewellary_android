@@ -19,7 +19,7 @@ const AddSchemeScreen = () => {
     { label: 'Plan - 10000', value: '10000' },
   ];
 
-  const [chitType, setChitType] = useState('metal');
+  const [chitType, setChitType] = useState('1');
   const [mobileNumber, setMobileNumber] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [address1, setAddress1] = useState('');
