@@ -185,10 +185,10 @@ const MyChitsScreen = () => {
                   <View style={styles.chitDetails}>
                     <ListItem theme={{ colors: { primary: '#fff' } }}>
                       <ListItem.Content>
-                        <ListItem.Title style={{ color: 'white' }}>Name: {item.chits.CustName}</ListItem.Title>
-                        <ListItem.Title style={{ color: 'white' }}>Last Inst Paid: {item.receipts.length ? item.receipts[0].InstNo : '-'}/11</ListItem.Title>
-                        <ListItem.Title style={{ color: 'white' }}>Last Inst Date: {getDate(item.receipts.length ? item.receipts[0].TrDate : new Date())} Rs:{item.receipts[0].InstAmt} /-</ListItem.Title>
-                        <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Current Due: {getDueDate(item.chits.TrDate ? item.chits.TrDate : new Date())} - {item.chits.InstAmt ? item.chits.InstAmt : '-'}</ListItem.Subtitle>
+                        <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Name:  {item.chits.CustName}</ListItem.Subtitle>
+                        <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Last Inst Paid:  {item.receipts.length && item.receipts[0].InstNo ? item.receipts[0].InstNo + '/11' : '-'}</ListItem.Subtitle>
+                        <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Last Inst Date:  {item.receipts.length && item.receipts[0].TrDate && item.chits.InstAmt && getDate(item.receipts[0].TrDate) + ' - Rs: ' + item.chits.InstAmt + '/-' || '-' }</ListItem.Subtitle>
+                        <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Current Due:  {item.receipts.length && item.receipts[0].TrDate && item.chits.InstAmt && getDueDate(item.receipts[0].TrDate) + ' - Rs: ' + item.chits.InstAmt + '/-' || '-' }</ListItem.Subtitle>
                       </ListItem.Content>
                     </ListItem>
                     {!item.receipts.length || Math.floor((new Date().getTime() - new Date(item.receipts[0].TrDate).getTime()) / (1000 * 60 * 60 * 24)) > 30 &&
