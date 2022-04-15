@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, FlatList, Alert, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, FlatList, Alert, Keyboard } from 'react-native';
 import { ListItem, Button, ThemeProvider, Icon } from 'react-native-elements';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
@@ -67,11 +67,13 @@ const MyChitsScreen = () => {
 
   const getCustomerSchemes = () => {
     console.log(customerPhone);
+    Keyboard.dismiss();
     // setMakeApiCall(true);
     if (!customerPhone) {
       showAlert('Kindly enter customer mobile number');
       return;
     }
+    setExpanded('');
     setMyChits([]);
     fetch(`${API_URL}/schemes?mobileNumber=${customerPhone}`, {
       method: 'GET',
@@ -116,6 +118,7 @@ const MyChitsScreen = () => {
           const jsonRes = await res.json();
           if (res.status === 200) {
             showAlert('Payment Done Successfully');
+            getCustomerSchemes();
           }
         } catch (err) {
           console.log(err);
@@ -136,21 +139,21 @@ const MyChitsScreen = () => {
     <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
       <View style={{ flex: 1 }}>
         {storeLogin &&
-          <View style={styles.form}>
+          <View style={[styles.form, (storeLogin && viewChits) ? { borderBottomWidth: 1, borderBottomColor: 'white' } : '' ]}>
 
-            <View style={styles.inputs}>
+            {/* <View style={styles.inputs}> */}
               {/* <View style={{ flexDirection: 'row' }}> */}
               <Text style={styles.customerSchemesHeading}>Get the customer details</Text>
-              <TextInput style={styles.input} placeholderTextColor='white' maxLength={10}
+              <TextInput style={styles.input} placeholderTextColor='white' maxLength={10} keyboardType="number-pad"
                 placeholder="Customer Phone Number" value={customerPhone} onChangeText={setCustomerPhone}></TextInput>
               <TouchableOpacity style={styles.getCustomerSchemes} onPress={() => { getCustomerSchemes() }}>
                 <Text style={styles.buttonText}>Fetch Customer Details</Text>
               </TouchableOpacity>
-            </View>
+            {/* </View> */}
           </View>
         }
         {(!storeLogin || viewChits) &&
-          <View style={styles.chits}>
+          <View style={!storeLogin ? styles.chits : styles.customerChits}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.heading}>{storeLogin ? 'Customer Chit Details' : 'Your Existing Chits'}</Text>
               <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
@@ -188,7 +191,7 @@ const MyChitsScreen = () => {
                         <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Current Due: {getDueDate(item.chits.TrDate ? item.chits.TrDate : new Date())} - {item.chits.InstAmt ? item.chits.InstAmt : '-'}</ListItem.Subtitle>
                       </ListItem.Content>
                     </ListItem>
-                    {Math.floor((new Date().getTime() - new Date(item.chits.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30 &&
+                    {!item.receipts.length || Math.floor((new Date().getTime() - new Date(item.receipts[0].TrDate).getTime()) / (1000 * 60 * 60 * 24)) > 30 &&
                       <ListItem theme={{ colors: { primary: '#fff' } }}>
                         <ListItem.Content>
                           <TouchableOpacity style={styles.button} onPress={() => { payDueHandler(item) }}>
@@ -219,6 +222,11 @@ const styles = StyleSheet.create({
     width: '80%',
     marginTop: '20%',
   },
+  customerChits: {
+    flex: 1,
+    width: '80%',
+    marginTop: '3%',
+  },
   chitDetails: {
     width: '100%',
     marginLeft: '10%',
@@ -248,10 +256,11 @@ const styles = StyleSheet.create({
     marginLeft: '10%',
   },
   form: {
-    flex: 0.5,
+    // flex: 0.5,
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingBottom: '5%',
-    marginTop: '15%',
+    paddingTop: '20%',
   },
   inputs: {
     width: '100%',
