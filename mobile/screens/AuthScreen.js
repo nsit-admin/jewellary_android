@@ -42,12 +42,14 @@ const AuthScreen = () => {
     const otpHandler = () => {
         if (!isOtpSent) {
             let endpoint = '/sendOtp';
+            const isLogin = (screenType === 'SignIn') ? 'login' : 'signup'
             let payload = {
                 mobileNumber,
-                otp
+                otp,
+                isLogin
             };
             if (!mobileNumber) {
-                showAlert('Kindly enter mobile number');
+                showAlert('please enter your phone number');
                 return;
             }
             fetch(`${API_URL}${endpoint}`, {
@@ -238,6 +240,7 @@ const AuthScreen = () => {
         // alert(status + message);
         return message;
     }
+    
 
     const showAlert = (message) => {
         Alert.alert(message);

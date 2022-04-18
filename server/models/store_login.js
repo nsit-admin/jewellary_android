@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize';
 
 import sequelize from '../utils/database.js';
 
-const CustomerCreds = sequelize.define('mobile_customers', {
+const StoreLogin = sequelize.define('store_login', {
    srNo: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
@@ -27,4 +27,4 @@ const CustomerCreds = sequelize.define('mobile_customers', {
    freezeTableName: true,
 });
 
-export default CustomerCreds;
+export default StoreLogin;
