@@ -165,12 +165,12 @@ const AddSchemeScreen = () => {
           <Text style={styles.notes}>
           Bonus Details{"\n"}
 CASH{"\n"}
-Free Gift + 1 Month Bonus at the end of scheme{"\n"}
+Free Gift + 1 Month Bonus at the end of 11th month{"\n"}
 GOLD{"\n"}
-Free Gift + No MC, No VA (Wastage) on accumulated weight at the end of scheme{"\n"}
+Free Gift + No MC, No VA (Wastage) on accumulated weight at end of 11th Month {"\n"}
 Terms & Conditions{"\n"}
 Only ONE instalment per month{"\n"}
-Scheme maturity ONE month after end of scheme{"\n"}
+Scheme maturity after 11 Month{"\n"}
 No Cash/Coins will be given for Bonus scheme{"\n"}
 ONE instalment will be deducted if discontinued{"\n"}
 No CASH for GOLD scheme{"\n"}

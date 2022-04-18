@@ -111,7 +111,7 @@ const MyChitsScreen = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(item.chits),
+      body: JSON.stringify(item),
     })
       .then(async res => {
         try {

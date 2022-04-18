@@ -167,14 +167,14 @@
         // console.log(req)
         Chits.findOne({ // THIS WILL BE PAYMENT GATEWAAY CALL
             where: {
-                MobileNo: req.body.MobileNo,
+                MobileNo: req.body.chits.MobileNo,
             }
         })
             .then(dbUser => {
                 if (!dbUser) {
                     return res.status(404).json({ message: "Gateway Error" });
                 } else {
-                    sequelize.query('SELECT max(trno) pkey, instno from chitrec')
+                    sequelize.query('SELECT max(trno) pkey from chitrec')
                         .then((val) => {
                             let rate = '0.00';
                             let weight = '0.000';
@@ -186,16 +186,16 @@
                             const pk = val[0][0].pkey
                             ChitRec.create({
                                 trno: parseInt(pk) + 1,
-                                yrtrno: req.body.yrtrno,
-                                chitno: req.body.trno,
+                                yrtrno: req.body.chits.yrtrno,
+                                chitno: req.body.chits.trno,
                                 trdate: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
-                                instno: (parseInt(val[0][0].instno) || 0) + 1,
-                                instamt: req.body.InstAmt,
+                                instno: (parseInt(req.body.receipts[0].InstNo) || 0) + 1,
+                                instamt: req.body.chits.InstAmt,
                                 rate: rate, // TODO - GEt it from other table during insertion
                                 wt: weight, // TODO - Calculation to be done
                                 DateStamp: dateformat(new Date(), "yyyy-mm-dd h:MM:ss")
                             }).then((ins) => {
-                                sendPaymentSuccess(req.body.mobileNumber);
+                                sendPaymentSuccess(req.body.chits.MobileNo);
                                 return res.status(200).json({ message: `payment completed for the chitNo - ${req.body.chitno}, your receipt number is ${parseInt(pk) + 1}` });
                             }).catch((err) => {
                                 return res.status(500).json({ message: `Unexpected error occured, please try again later` });
@@ -214,7 +214,10 @@
             where: {
                 MobileNo: req.query.mobileNumber,
                 [Op.or]: [{ setno: null }, { setno: 0 }]
-            }
+            },
+            order: [
+                ['trno', 'DESC']
+            ],
         })
             .then((chits) => {
                 if (chits && chits.length) {
