@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View, ImageBackground, Image, Text } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, ImageBackground, Image, Text, Alert, BackHandler } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -29,8 +29,22 @@ export default function App() {
 
   const navigationRef = React.createRef();
 
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (navigationRef.current?.getCurrentRoute()?.name === 'Guru Hasti Chit Details') {
+        logoutHandler();
+        return true;
+      }
+      return false;
+    });
+  });
+
   const logoutHandler = () => {
-    navigationRef.current?.navigate('Sign In', {logout: true});
+    Alert.alert("Logout", "Are you sure that you want to logout?", 
+      [{ text: "Cancel", onPress: () => {}, style: "cancel" },
+      { text: "Logout", onPress: () => navigationRef.current?.navigate('Sign In', {logout: true}) }], 
+      { cancelable: false }
+    );
   };
 
   return (
