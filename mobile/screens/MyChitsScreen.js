@@ -26,14 +26,14 @@ const MyChitsScreen = () => {
   });
 
   const getDueDate = (val) => {
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const d = val ? new Date(val) : new Date();
     // console.log("dude => ", months[d.getMonth()] + " " + d.getFullYear())
     var month = d.getMonth();
     if (month === 11) {
-      return months[d.getMonth()] + " " + d.getFullYear() + 1;
+      return months[d.getMonth()] + " " + (d.getFullYear() + 1).toString().substr(-2);
     } else {
-      return months[d.getMonth() + 1] + " " + d.getFullYear();
+      return months[d.getMonth() + 1] + " " + d.getFullYear().toString().substr(-2);
     };
   }
 
