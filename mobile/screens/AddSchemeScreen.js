@@ -139,7 +139,10 @@ const AddSchemeScreen = () => {
                 <Text style={styles.radioButtonText}>Metal</Text>
               </View>
             </RadioButton.Group>
-            <TextInput style={styles.input} editable={isEditable} placeholderTextColor='white' placeholder='Mobile Number' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
+            <View style={styles.inputContainer}>
+              <Text style={styles.prefix}>+91</Text>
+              <TextInput style={styles.input} editable={isEditable} placeholderTextColor='white' placeholder='Mobile Number' autoCapitalize='none' value={mobileNumber} onChangeText={setMobileNumber}></TextInput>
+            </View>
             <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Customer Name" value={customerName} onChangeText={setCustomerName}></TextInput>
             <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Address Line 1" value={address1} onChangeText={setAddress1}></TextInput>
             <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Address Line 2" value={address2} onChangeText={setAddress2}></TextInput>
@@ -278,7 +281,20 @@ input: {
     color: 'white',
     padding: 5,
     textDecorationColor: 'white',
-  }
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    width: '90%',
+  },
+  prefix: {
+    marginTop: '4.9%',
+    paddingBottom: '5%',
+    marginLeft: '6%',
+    color: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: 'white',
+    fontSize: 16,
+  },
 });
 
 export default AddSchemeScreen;
