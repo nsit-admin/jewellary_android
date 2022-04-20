@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, FlatList, Alert, Keyboard } from 'react-native';
+import { ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, FlatList, Alert, Keyboard, BackHandler } from 'react-native';
 import { ListItem, Button, ThemeProvider, Icon } from 'react-native-elements';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
@@ -15,15 +15,30 @@ const MyChitsScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
 
-
-
   useEffect(() => {
     setStoreLogin(route.params.isStoreLogin);
     if (!storeLogin && (myChits.length === 0 || route.params.reload)) {
       getMySchemes();
       route.params.reload = false;
     }
-  });
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backButtonHandler);
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
+
+  const backButtonHandler = () => {
+    logoutHandler();
+    return true;
+  };
+
+  const logoutHandler = () => {
+    Alert.alert("Logout", "Are you sure that you want to logout?", 
+      [{ text: "Cancel", onPress: () => {}, style: "cancel" },
+      { text: "Logout", onPress: () => navigation.navigate('Sign In', {logout: true}) }], 
+      { cancelable: false }
+    );
+  };
 
   const getDueDate = (val) => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
