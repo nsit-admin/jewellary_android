@@ -5,6 +5,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 // const API_URL = Platform.OS === 'ios' ? 'http://localhost:5000' : 'http://10.0.2.2:5000';
 const API_URL = 'http://65.1.124.220:5000/api';
 // const API_URL = 'http://localhost:5000/api';
+const RESEND_OTP_SECONDS = 60;
 
 const AuthScreen = () => {
 
@@ -25,6 +26,8 @@ const AuthScreen = () => {
 
     const [message, setMessage] = useState('');
     const [screenType, setScreenType] = useState('SignIn');
+    const [resendOTPTimer, setResendOTPTimer] = useState(RESEND_OTP_SECONDS)
+    const [resendOTPCount, setResendOTPCount] = useState(0)
 
     const route = useRoute();
     const navigation = useNavigation();
@@ -67,6 +70,7 @@ const AuthScreen = () => {
                             showAlert('There was a problem. Please try again later.');
                         } else {
                             setIsOtpSent(true);
+                            startResendOTPTimer();
                         }
                     } catch (err) {
                         setIsError(true);
@@ -220,6 +224,39 @@ const AuthScreen = () => {
             });
     };
 
+    const startResendOTPTimer = () => {
+        setResendOTPTimer(RESEND_OTP_SECONDS);
+        let interval = setInterval(() => {
+            setResendOTPTimer(lastTimerCount => {
+                lastTimerCount <= 1 && clearInterval(interval)
+                return lastTimerCount - 1
+            });
+        }, 1000)
+        return () => clearInterval(interval);
+    }
+
+    const resendOTPHandler = () => {
+        fetch(`${API_URL}/resendotp?mobileNumber=${mobileNumber}`, {
+          method: 'GET',
+        })
+          .then(async res => {
+            try {
+              const jsonRes = await res.json();
+              setResendOTPCount(resendOTPCount + 1);
+              setResendOTPTimer(RESEND_OTP_SECONDS);
+              startResendOTPTimer();
+              showAlert(jsonRes.message);
+            } catch (err) {
+              console.log(err);
+              showAlert('There was a problem. Please try again later.');
+            };
+          })
+          .catch(err => {
+            console.log(err);
+            showAlert('There was a problem. Please try again later.');
+          });
+    };
+
     const screenTypeHandler = (screenType) => {
         setMobileNumber('');
         setOtp('');
@@ -232,6 +269,8 @@ const AuthScreen = () => {
         setAddress3('');
         setIsOtpSent(false);
         setIsOtpVerified(false);
+        setResendOTPTimer(RESEND_OTP_SECONDS);
+        setResendOTPCount(0);
         setScreenType(screenType);
     };
 
@@ -240,7 +279,6 @@ const AuthScreen = () => {
         // alert(status + message);
         return message;
     }
-    
 
     const showAlert = (message) => {
         Alert.alert(message);
@@ -280,6 +318,14 @@ const AuthScreen = () => {
                         {/* {screenType === 'SignUpExisting' && <TextInput secureTextEntry={true} style={styles.input} placeholderTextColor='white' placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>} */}
 
                         <Text style={[styles.message, { color: 'white' }]}>{message ? getMessage() : null}</Text>
+                        {isOtpSent && resendOTPCount < 3 &&
+                            <TouchableOpacity onPress={resendOTPHandler} disabled={resendOTPTimer > 0}>
+                                <Text style={{marginBottom: '4%'}}>
+                                    <Text style={styles.linkText}>Resend OTP</Text>
+                                    { resendOTPTimer > 0 && <Text style={styles.normalText}>  in {resendOTPTimer} seconds</Text> }
+                                </Text>
+                            </TouchableOpacity>
+                        }
                         {screenType === 'SignUpNew' &&
                             <TouchableOpacity style={styles.button} onPress={isOtpVerified ? onSubmitHandler : otpHandler}>
                                 {isOtpVerified && <Text style={styles.buttonText}>{'Register'}</Text>}
