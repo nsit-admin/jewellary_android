@@ -257,7 +257,7 @@ const schemesAddition = (req, res, next) => {
                 Add1: req.body.address1,
                 Add2: req.body.address2,
                 Add3: req.body.address3,
-                Stcode: req.body.chitType,
+                STCode: req.body.chitType,
                 NoI: 11,
                 UserCode1: '0',
                 InstAmt: req.body.instamt,

@@ -67,7 +67,7 @@ const AuthScreen = () => {
                         if (res.status !== 200) {
                             setIsError(true);
                             // setMessage('There was a problem. Please try again later.');
-                            showAlert('There was a problem. Please try again later.');
+                            showAlert(res.message);
                         } else {
                             setIsOtpSent(true);
                             startResendOTPTimer();
@@ -106,7 +106,7 @@ const AuthScreen = () => {
                         if (res.status !== 200) {
                             setIsError(true);
                             // setMessage('There was a problem. Please try again later.');
-                            showAlert('There was a problem. Please try again later.');
+                            showAlert(res.message);
                         } else {
                             setIsOtpVerified(true);
                             if (screenType === 'SignIn') {
@@ -287,7 +287,7 @@ const AuthScreen = () => {
     return (
         <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
             <ScrollView style={styles.card}>
-                {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Text style={styles.headline}>Guru Hasti Thanga Maaliai</Text>}
+                {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Text style={styles.headline}>Guru Hasti Thanga Maaligai</Text>}
                 {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Text style={styles.subheadline}>Welcome to Chit Online Payment System</Text>}
                 {screenType === 'SignUpExisting' && <Text style={styles.welcomeText}>Kindly provide registered phone number and last receipt number</Text>}
                 {screenType === 'SignUpNew' && <Text style={styles.welcomeText}>Kindly provide all the below details to complete your new registration</Text>}
