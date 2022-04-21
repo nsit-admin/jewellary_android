@@ -133,7 +133,11 @@ const MyChitsScreen = () => {
           const jsonRes = await res.json();
           if (res.status === 200) {
             showAlert('Payment Done Successfully');
-            getCustomerSchemes();
+            if (storeLogin) {
+              getCustomerSchemes();
+            } else {
+              getMySchemes();
+            }
           }
         } catch (err) {
           console.log(err);
