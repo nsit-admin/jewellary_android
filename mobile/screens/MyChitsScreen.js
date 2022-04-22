@@ -81,7 +81,6 @@ const MyChitsScreen = () => {
   };
 
   const getCustomerSchemes = () => {
-    console.log(customerPhone);
     Keyboard.dismiss();
     // setMakeApiCall(true);
     if (!customerPhone) {

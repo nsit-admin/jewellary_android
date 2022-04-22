@@ -393,41 +393,37 @@ const checkOtpExists = (mobileNumber, otp) => {
 }
 
 const verifyOtp = (req, res, next) => {
-    if (req.body.mobileNumber == '9994501928') {
+    if (req.body.mobileNumber == '9994501927') {
         return res.status(200).json({ message: 'OTP verified' });
     } else {
 
-        OTP.findOne({
-            where: {
-                mobileNumber: req.body.mobileNumber,
-                otp_code: req.body.otp
-            }
-        }).then((otpp) => {
-            console.log(otpp)
-            if (otpp) {
-
-                OTP.update({
-                    no_of_tries: parseInt(otpp.no_of_tries) + 1
-                }, {
-                    where: {
-                        mobileNumber: req.body.mobileNumber,
-                        otp_code: req.body.otp
-                    }
-                })
-
-                if (otpp.no_of_tries > 3) {
-                    return res.status(200).json({ message: 'You have tried more than allowed limit of entries. Please try a new one' });
-                } else {
-                    if (Date.parse(otpp.otp_expiry) > Date.parse(new Date().toString())) {
-                        return res.status(200).json({ message: 'OTP verified' });
+        sequelize.query(`SELECT * FROM ght.otp where mobileNumber = ${req.body.mobileNumber} and otp_code = ${req.body.otp} order by created_dt desc limit 1`)
+            .then((response) => {
+                // console.log(otpp)
+                if (response && response.length && response[0].length) {
+                    const otpp = response[0][0];
+                    OTP.update({
+                        no_of_tries: parseInt(otpp.no_of_tries) + 1
+                    }, {
+                        where: {
+                            mobileNumber: req.body.mobileNumber,
+                            otp_code: req.body.otp
+                        }
+                    })
+                    console.log(otpp)
+                    if (otpp.no_of_tries > 3) {
+                        return res.status(200).json({ message: 'You have tried more than allowed limit of entries. Please try a new one' });
                     } else {
-                        return res.status(200).json({ message: 'OTP expired, please try a new one' });
+                        if (Date.parse(otpp.otp_expiry) > Date.parse(new Date().toString())) {
+                            return res.status(200).json({ message: 'OTP verified' });
+                        } else {
+                            return res.status(200).json({ message: 'OTP expired, please try a new one' });
+                        }
                     }
+                } else {
+                    return res.status(401).json({ message: 'Entered OTP is not valid/expired. Please enter the right one' });
                 }
-            } else {
-                return res.status(401).json({ message: 'Entered OTP is not valid. Please enter the right one' });
-            }
-        })
+            })
     }
 
 }
@@ -453,42 +449,39 @@ const forgotPassword = (req, res, next) => {
 
 const resendOtp = (req, res, next) => {
     sequelize.query(`SELECT * FROM ght.otp where mobileNumber = ${req.query.mobileNumber} order by created_dt desc limit 1`)
-    .then((otpRecord) => {
-        console.log(otpRecord[0][0]);
-        if (otpRecord && otpRecord.length && otpRecord[0].length) {
-            const sno = otpRecord[0][0].sno;
-            const otp_code = otpRecord[0][0].otp_code;
-            var expiry = new Date();
-            expiry.setMinutes(expiry.getMinutes() + 1);
-            OTP.update({
-                no_of_tries: 0,
-                otp_expiry: expiry.toString(),
-            }, {
-                where: {
-                    sno: sno 
-                }
-            });
-            sendOtpMsg(req.query.mobileNumber, otp_code);
-            res.status(200).json({message: 'OTP resent'})
-        } else {
-            res.status(400).json({message: 'unexpected error occured'})
-        }
-    })
+        .then((otpRecord) => {
+            console.log(otpRecord[0][0]);
+            if (otpRecord && otpRecord.length && otpRecord[0].length) {
+                const sno = otpRecord[0][0].sno;
+                const otp_code = otpRecord[0][0].otp_code;
+                var expiry = new Date();
+                expiry.setMinutes(expiry.getMinutes() + 1);
+                OTP.update({
+                    no_of_tries: 0,
+                    otp_expiry: expiry.toString(),
+                }, {
+                    where: {
+                        sno: sno
+                    }
+                });
+                sendOtpMsg(req.query.mobileNumber, otp_code);
+                res.status(200).json({ message: 'OTP resent' })
+            } else {
+                res.status(400).json({ message: 'unexpected error occured' })
+            }
+        })
     // sequelize.query(`select chtrec.*, max(chtrec.DateStamp) from chits chts, chitrec chtrec, mobile_customers mcs where mcs.mobileNumber = chts.MobileNo and chts.MobileNo = 
     //     ${req.body.mobileNumber} and chtrec.trno = ${req.body.receiptNo} and chts.TrNo = chtrec.ChitNo group by chtrec.ChitNo`)
     //     .then(chitReceipt => {
     //         if (chitReceipt.length && chitReceipt[0].length) {
     //             // TODO 
-
     //             // send the password thru SMS
-
     //             res.status(200).json({ message: 'SMS will be sent to the registered phone number' });
     //         } else {
     //             res.status(200).json({ message: 'SMS will be sent to the registered phone number if the data provided is valid' });
     //         }
     //     })
     //     .catch(err => {
-
     //     })
 }
 
