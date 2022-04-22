@@ -393,7 +393,7 @@ const checkOtpExists = (mobileNumber, otp) => {
 }
 
 const verifyOtp = (req, res, next) => {
-    if (req.body.mobileNumber == '9994501927') {
+    if (req.body.mobileNumber == '9994501928') {
         return res.status(200).json({ message: 'OTP verified' });
     } else {
 
