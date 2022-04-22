@@ -67,7 +67,7 @@ const AuthScreen = () => {
                         if (res.status !== 200) {
                             setIsError(true);
                             // setMessage('There was a problem. Please try again later.');
-                            showAlert(res.message);
+                            showAlert('Entered mobile number is not registerd with Guru Hasti, please register now');
                         } else {
                             setIsOtpSent(true);
                             startResendOTPTimer();
