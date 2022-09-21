@@ -288,7 +288,7 @@ const AuthScreen = () => {
         <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
             <ScrollView style={styles.card}>
                 {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Text style={styles.headline}>Guru Hasti Thanga Maaligai</Text>}
-                {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Text style={styles.subheadline}>Welcome to Chit Online Payment System</Text>}
+                {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Text style={styles.subheadline}>Welcome to Gold Scheme Online Payment System</Text>}
                 {screenType === 'SignUpExisting' && <Text style={styles.welcomeText}>Kindly provide registered phone number and last receipt number</Text>}
                 {screenType === 'SignUpNew' && <Text style={styles.welcomeText}>Kindly provide all the below details to complete your new registration</Text>}
                 {(screenType === 'SignIn' || screenType === 'StoreLogin') && <Image style={styles.logo} source={require('../public/images/Guruhasti-Thangamaligai.png')} />}

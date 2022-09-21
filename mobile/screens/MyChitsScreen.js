@@ -173,7 +173,7 @@ const MyChitsScreen = () => {
         {(!storeLogin || viewChits) &&
           <View style={!storeLogin ? styles.chits : styles.customerChits}>
             <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.heading}>{storeLogin ? 'Customer Chit Details' : 'Your Existing Chits'}</Text>
+              <Text style={styles.heading}>{storeLogin ? 'Customer Chit Details' : 'Your Existing Schemes'}</Text>
               <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
                 <Text style={styles.addSchemeText}>Add Scheme</Text>
               </TouchableOpacity>
@@ -190,7 +190,7 @@ const MyChitsScreen = () => {
                     <>
                       <Icon name='money' type='font-awesome' size={20} color={'white'} />
                       <ListItem.Content>
-                        <ListItem.Title style={{ color: 'white', fontWeight: 'bold' }}>  Chit Number - {item.chits.yrtrno}</ListItem.Title>
+                        <ListItem.Title style={{ color: 'white', fontWeight: 'bold' }}>  Scheme No - {item.chits.yrtrno}</ListItem.Title>
                         {/* <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle> */}
                       </ListItem.Content>
                     </>
