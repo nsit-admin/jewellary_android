@@ -110,7 +110,7 @@ const AuthScreen = () => {
                         } else {
                             setIsOtpVerified(true);
                             if (screenType === 'SignIn') {
-                                navigation.navigate('Guru Hasti Chit Details', { mobileNumber, isStoreLogin: false });
+                                navigation.navigate('Guru Hasti Scheme Details', { mobileNumber, isStoreLogin: false });
                             }
                         }
                     } catch (err) {
@@ -203,7 +203,7 @@ const AuthScreen = () => {
                         showAlert(jsonRes.message);
                     } else {
                         if (screenType === 'StoreLogin') {
-                            navigation.navigate('Guru Hasti Chit Details', { mobileNumber, isStoreLogin: true });
+                            navigation.navigate('Guru Hasti Scheme Details', { mobileNumber, isStoreLogin: true });
                         } else {
                             setIsError(false);
                             // setMessage(jsonRes.message);

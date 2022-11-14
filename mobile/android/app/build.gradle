@@ -135,8 +135,8 @@ android {
         applicationId "com.ght"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 9
-        versionName "1.0.9"
+        versionCode 11
+        versionName "2.0.0"
     }
     splits {
         abi {

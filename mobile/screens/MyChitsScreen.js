@@ -173,7 +173,7 @@ const MyChitsScreen = () => {
         {(!storeLogin || viewChits) &&
           <View style={!storeLogin ? styles.chits : styles.customerChits}>
             <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.heading}>{storeLogin ? 'Customer Chit Details' : 'Your Existing Schemes'}</Text>
+              <Text style={styles.heading}>{storeLogin ? 'Customer Scheme Details' : 'Your Existing Schemes'}</Text>
               <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
                 <Text style={styles.addSchemeText}>Add Scheme</Text>
               </TouchableOpacity>

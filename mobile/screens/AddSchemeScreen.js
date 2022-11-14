@@ -98,7 +98,7 @@ const AddSchemeScreen = () => {
         try {
             const jsonRes = await res.json();
             if (res.status === 200) {
-              navigation.navigate('Guru Hasti Chit Details', { mobileNumber, reload: true })
+              navigation.navigate('Guru Hasti Scheme Details', { mobileNumber, reload: true })
             } else {
               // setMessage(jsonRes.message);
               showAlert(jsonRes.message);
