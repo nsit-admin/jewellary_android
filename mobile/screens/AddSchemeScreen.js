@@ -41,7 +41,7 @@ const AddSchemeScreen = () => {
     //   chit = getCustomerDetails(route.params.mobileNumber);
     // } 
     // console.log(route.params.myChits)
-    if(chit && !isDefaultsSet) {
+    if (chit && !isDefaultsSet) {
       setMobileNumber(chit.chits.MobileNo);
       setCustomerName(chit.chits.CustName);
       setAddress1(chit.chits.Add1);
@@ -58,19 +58,19 @@ const AddSchemeScreen = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-  }).then((res) => {
-    return res;
-  })
+    }).then((res) => {
+      return res;
+    })
   }
 
   const addScheme = () => {
     if (!customerName || !address1 || !address2 || !address3 || !instamt.value) {
       // if(!message) {
-        // setMessage('Kindly provide all the details');
-        showAlert('Kindly provide all the details');
+      // setMessage('Kindly provide all the details');
+      showAlert('Kindly provide all the details');
       // }
       return;
-    } 
+    }
     // else {
     //   const inpt = isNaN(instamt) ? 0 : Number(instamt);
     //   if (inpt < 500 || inpt > 10000 || inpt % 500 != 0) {
@@ -88,28 +88,28 @@ const AddSchemeScreen = () => {
       instamt: instamt.value
     };
     fetch(`${API_URL}/schemes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
     })
-    .then(async res => { 
+      .then(async res => {
         try {
-            const jsonRes = await res.json();
-            if (res.status === 200) {
-              navigation.navigate('Guru Hasti Scheme Details', { mobileNumber, reload: true })
-            } else {
-              // setMessage(jsonRes.message);
-              showAlert(jsonRes.message);
-            }
+          const jsonRes = await res.json();
+          if (res.status === 200) {
+            navigation.navigate('Guru Hasti Scheme Details', { mobileNumber, reload: true })
+          } else {
+            // setMessage(jsonRes.message);
+            showAlert(jsonRes.message);
+          }
         } catch (err) {
-            console.log(err);
+          console.log(err);
         };
-    })
-    .catch(err => {
+      })
+      .catch(err => {
         console.log(err);
-    });
+      });
   };
 
   const showAlert = (message) => {
@@ -123,7 +123,7 @@ const AddSchemeScreen = () => {
         <View style={styles.form}>
           <View style={styles.inputs}>
             <RadioButton.Group onValueChange={setChitType} value={chitType}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.radioButtonText}>Savings Type: </Text>
                 <RadioButton
                   color='white'
@@ -150,10 +150,10 @@ const AddSchemeScreen = () => {
             {/* <TextInput style={styles.input} editable={!isEditable} placeholderTextColor='white' placeholder="Installment Amount" value={instamt} onChangeText={setInstamt}></TextInput> */}
             <Dropdown
               style={styles.dropdown}
-              placeholderStyle={{color: 'white'}}
-              selectedTextStyle={{color: 'black'}}
-              selectedTextProps={{style: {color: 'white', fontSize: 16}}}
-              iconStyle={{tintColor: 'white'}}
+              placeholderStyle={{ color: 'white' }}
+              selectedTextStyle={{ color: 'black' }}
+              selectedTextProps={{ style: { color: 'white', fontSize: 16 } }}
+              iconStyle={{ tintColor: 'white' }}
               data={instData}
               labelField="label"
               valueField="value"
@@ -166,18 +166,18 @@ const AddSchemeScreen = () => {
             </TouchableOpacity>
           </View>
           <Text style={styles.notes}>
-          Bonus Details{"\n"}
-CASH{"\n"}
-Free Gift + 1 Month Bonus at the end of 11th month{"\n"}
-GOLD{"\n"}
-Free Gift + No MC, No VA (Wastage) on accumulated weight at end of 11th Month {"\n"}
-Terms & Conditions{"\n"}
-Only ONE instalment per month{"\n"}
-Scheme maturity after 11 Month{"\n"}
-No Cash/Coins will be given for Bonus scheme{"\n"}
-ONE instalment will be deducted if discontinued{"\n"}
-No CASH for GOLD scheme{"\n"}
-GST Applicable{"\n"}
+            Bonus Details{"\n"}
+            CASH{"\n"}
+            Free Gift + 1 Month Bonus at the end of 11th month{"\n"}
+            GOLD{"\n"}
+            Free Gift + No MC, No VA (Wastage) on accumulated weight at end of 11th Month {"\n"}
+            Terms & Conditions{"\n"}
+            Only ONE instalment per month{"\n"}
+            Scheme maturity after 11 Month{"\n"}
+            No Cash/Coins will be given for Bonus scheme{"\n"}
+            ONE instalment will be deducted if discontinued{"\n"}
+            No CASH for GOLD scheme{"\n"}
+            GST Applicable{"\n"}
           </Text>
         </View>
       </ScrollView>
@@ -215,24 +215,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: '10%',
-},
-notes: {
-  // width: '80%',
-  // borderBottomWidth: 1,
-  // borderBottomColor: 'white',
-  fontSize: 10,
-  color: 'black',
-  fontStyle: 'italic',
-  marginTop: 10,
+  },
+  notes: {
+    // width: '80%',
+    // borderBottomWidth: 1,
+    // borderBottomColor: 'white',
+    fontSize: 10,
+    color: 'black',
+    fontStyle: 'italic',
+    marginTop: 10,
 
-},
-input: {
+  },
+  input: {
     width: '80%',
     borderBottomWidth: 1,
     borderBottomColor: 'white',
     fontSize: 16,
     color: 'white',
-},
+  },
   button: {
     width: '40%',
     backgroundColor: 'white',
@@ -243,9 +243,9 @@ input: {
     marginTop: 20,
   },
   buttonText: {
-      color: 'red',
-      fontSize: 16,
-      fontWeight: '600',
+    color: 'red',
+    fontSize: 16,
+    fontWeight: '600',
   },
   addScheme: {
     width: '35%',
