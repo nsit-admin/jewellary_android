@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, FlatList, Alert, Keyboard, BackHandler } from 'react-native';
 import { ListItem, Button, ThemeProvider, Icon } from 'react-native-elements';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from "react-native";
+import { WebView } from 'react-native-webview';
 
 const API_URL = 'http://65.1.124.220:5000/api';
 
@@ -11,6 +13,7 @@ const MyChitsScreen = () => {
   const [storeLogin, setStoreLogin] = useState(false);
   const [viewChits, setViewChits] = useState(false);
   const [customerPhone, setCustomerPhone] = useState('');
+  const [showPayment, setShowPayment] = useState(false);
 
   const route = useRoute();
   const navigation = useNavigation();
@@ -33,9 +36,9 @@ const MyChitsScreen = () => {
   };
 
   const logoutHandler = () => {
-    Alert.alert("Logout", "Are you sure that you want to logout?", 
-      [{ text: "Cancel", onPress: () => {}, style: "cancel" },
-      { text: "Logout", onPress: () => navigation.navigate('Sign In', {logout: true}) }], 
+    Alert.alert("Logout", "Are you sure that you want to logout?",
+      [{ text: "Cancel", onPress: () => { }, style: "cancel" },
+      { text: "Logout", onPress: () => navigation.navigate('Sign In', { logout: true }) }],
       { cancelable: false }
     );
   };
@@ -112,6 +115,42 @@ const MyChitsScreen = () => {
     navigation.navigate('Add Scheme', { myChits });
   };
 
+  const payDueHandler1 = () => {
+    // const payload = {
+    //   mobileNumber: item.MobileNo,
+    //   trno: item.trno,
+    //   yrtrno: item.yrtrno,
+    //   chitno: item.yrtrno,
+    //   instno: Number(item.InstPaid) + 1,
+    // };
+    fetch(`http://65.1.124.220:3002/about`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(async res => {
+        try {
+          const jsonRes = await res.json();
+          if (res.status === 200) {
+            showAlert('Payment Done Successfully');
+            if (storeLogin) {
+              getCustomerSchemes();
+            } else {
+              getMySchemes();
+            }
+          }
+        } catch (err) {
+          console.log(err);
+          showAlert('There was a problem. Please try again later.');
+        };
+      })
+      .catch(err => {
+        console.log(err);
+        showAlert('There was a problem. Please try again later.');
+      });
+  };
+
   const payDueHandler = (item) => {
     // const payload = {
     //   mobileNumber: item.MobileNo,
@@ -139,12 +178,10 @@ const MyChitsScreen = () => {
             }
           }
         } catch (err) {
-          console.log(err);
           showAlert('There was a problem. Please try again later.');
         };
       })
       .catch(err => {
-        console.log(err);
         showAlert('There was a problem. Please try again later.');
       });
   };
@@ -155,18 +192,23 @@ const MyChitsScreen = () => {
 
   return (
     <ImageBackground source={require('../public/images/gradient.png')} style={styles.image}>
-      <View style={{ flex: 1 }}>
+      {showPayment && <SafeAreaView style={{ flex: 1 }}>
+        <WebView
+          source={{ uri: 'http://65.1.124.220:3002/about' }}
+        />
+      </SafeAreaView>}
+      {!showPayment && <View style={{ flex: 1 }}>
         {storeLogin &&
-          <View style={[styles.form, (storeLogin && viewChits) ? { borderBottomWidth: 1, borderBottomColor: 'white' } : '' ]}>
+          <View style={[styles.form, (storeLogin && viewChits) ? { borderBottomWidth: 1, borderBottomColor: 'white' } : '']}>
 
             {/* <View style={styles.inputs}> */}
-              {/* <View style={{ flexDirection: 'row' }}> */}
-              <Text style={styles.customerSchemesHeading}>Get the customer details</Text>
-              <TextInput style={styles.input} placeholderTextColor='white' maxLength={10} keyboardType="number-pad"
-                placeholder="Customer Phone Number" value={customerPhone} onChangeText={setCustomerPhone}></TextInput>
-              <TouchableOpacity style={styles.getCustomerSchemes} onPress={() => { getCustomerSchemes() }}>
-                <Text style={styles.buttonText}>Fetch Customer Details</Text>
-              </TouchableOpacity>
+            {/* <View style={{ flexDirection: 'row' }}> */}
+            <Text style={styles.customerSchemesHeading}>Get the customer details</Text>
+            <TextInput style={styles.input} placeholderTextColor='white' maxLength={10} keyboardType="number-pad"
+              placeholder="Customer Phone Number" value={customerPhone} onChangeText={setCustomerPhone}></TextInput>
+            <TouchableOpacity style={styles.getCustomerSchemes} onPress={() => { getCustomerSchemes() }}>
+              <Text style={styles.buttonText}>Fetch Customer Details</Text>
+            </TouchableOpacity>
             {/* </View> */}
           </View>
         }
@@ -176,6 +218,9 @@ const MyChitsScreen = () => {
               <Text style={styles.heading}>{storeLogin ? 'Customer Scheme Details' : 'Your Existing Schemes'}</Text>
               <TouchableOpacity style={styles.addScheme} onPress={addSchemeHandler}>
                 <Text style={styles.addSchemeText}>Add Scheme</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={() => { setShowPayment(true) }}>
+                <Text style={styles.buttonText}>Pay</Text>
               </TouchableOpacity>
             </View>
             <FlatList
@@ -206,7 +251,7 @@ const MyChitsScreen = () => {
                         <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Name:  {item.chits.CustName}</ListItem.Subtitle>
                         <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Chit Type:  {item.chits.STCode == '1' ? 'Metal' : 'Cash'}</ListItem.Subtitle>
                         <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Last Inst Paid:  {item.receipts.length && item.receipts[0].InstNo ? item.receipts[0].InstNo + '/11' : '0/11'}</ListItem.Subtitle>
-                        <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Last Inst Date:  {item.receipts.length && item.receipts[0].TrDate && item.chits.InstAmt && getDate(item.receipts[0].TrDate) + ' - Rs: ' + item.chits.InstAmt + '/-' || '-' }</ListItem.Subtitle>
+                        <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Last Inst Date:  {item.receipts.length && item.receipts[0].TrDate && item.chits.InstAmt && getDate(item.receipts[0].TrDate) + ' - Rs: ' + item.chits.InstAmt + '/-' || '-'}</ListItem.Subtitle>
                         <ListItem.Subtitle style={{ color: 'white', fontWeight: 'bold' }}>Current Due:  {getDueDate(item.receipts[0].TrDate) + ' - Rs: ' + item.chits.InstAmt + '/-'}</ListItem.Subtitle>
                       </ListItem.Content>
                     </ListItem>
@@ -225,7 +270,7 @@ const MyChitsScreen = () => {
             />
           </View>
         }
-      </View>
+      </View>}
     </ImageBackground>
   );
 };
