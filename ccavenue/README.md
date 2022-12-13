@@ -1,1 +1,0 @@
-# jewellary_android
