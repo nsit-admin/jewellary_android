@@ -25,27 +25,27 @@ const Scheme = ({ item }) => {
               <div className="values">
                 <span className="label">Name</span>
                 <br />
-                <span className="name">{item.name}</span>
+                <span className="value">{item.name}</span>
               </div>
               <div className="values">
                 <span className="label">Chit type</span>
                 <br />
-                <span className="name">{item.chitType}</span>
+                <span className="value">{item.chitType}</span>
               </div>
               <div className="values">
                 <span className="label">Last Installment Paid</span>
                 <br />
-                <span className="name">{item.lastInstPaid}</span>
+                <span className="value">{item.lastInstPaid}</span>
               </div>
               <div className="values">
                 <span className="label">Last Installment Amount</span>
                 <br />
-                <span className="name">{item.lastInstDateAndAmount[1]}</span>
+                <span className="value">{item.lastInstDateAndAmount[1]}</span>
               </div>
               <div className="values">
                 <span className="label">Current Due Date</span>
                 <br />
-                <span className="name">{item.currentDue[0]}</span>
+                <span className="value">{item.currentDue[0]}</span>
               </div>
             </div>
           )}

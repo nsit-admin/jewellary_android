@@ -39,7 +39,7 @@ const ExistingScheme = () => {
       <Header />
       <div className="heading">
         <h2>Your Existing Schemes</h2>
-        <Link className="addScheme">
+        <Link to="/add-scheme" className="addSchemeBtn">
           <button>Add Scheme</button>
         </Link>
       </div>

@@ -12,7 +12,7 @@
   display: flex;
   justify-content: space-between;
 }
-.existingScheme .heading .addScheme button {
+.existingScheme .heading .addSchemeBtn button {
   border: none;
   border-radius: 10px;
   padding: 10px 20px;

@@ -2,6 +2,7 @@ import "./App.css"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import Login from "./pages/Login/Login"
 import ExistingScheme from "./pages/ExistingScheme/ExistingScheme"
+import AddScheme from "./pages/AddScheme/AddScheme"
 
 const router = createBrowserRouter([
   {
@@ -11,6 +12,10 @@ const router = createBrowserRouter([
   {
     path: "/existing-scheme",
     element: <ExistingScheme />
+  },
+  {
+    path: "/add-scheme",
+    element: <AddScheme />
   }
 ])
 

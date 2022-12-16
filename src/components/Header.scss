@@ -19,6 +19,9 @@
 
 @media (max-width: 767px) {
   .header {
+    .logo {
+      margin: 0 auto;
+    }
     .logout {
       a {
         span {

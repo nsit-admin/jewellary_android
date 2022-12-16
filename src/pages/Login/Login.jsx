@@ -12,8 +12,18 @@ const Login = () => {
           <h1>Login</h1>
           <span>Please signin to your account</span>
           <div className="formContainer">
-            <input type="text" name="username" id="username" />
-            <input type="password" name="password" id="password" />
+            <input
+              type="text"
+              name="username"
+              id="username"
+              placeholder="Username"
+            />
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Password"
+            />
             <Link className="forgotPassword">
               <span>Forgot password?</span>
             </Link>

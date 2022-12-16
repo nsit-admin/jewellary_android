@@ -23,7 +23,7 @@
         border-radius: 6px;
       }
       .schemeName {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 500;
       }
     }
@@ -44,14 +44,15 @@
     padding: 20px;
     border-radius: 0 0 10px 10px;
     flex-wrap: wrap;
+    transition: all 3s ease;
 
     .values {
       .label {
         font-size: 12px;
         font-weight: 700;
       }
-      .name {
-        font-size: 18px;
+      .value {
+        font-size: 16px;
         margin-top: 5px;
         display: inline-block;
       }
