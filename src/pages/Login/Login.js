@@ -297,8 +297,10 @@ const getMessage = () => {
              {screenType === 'SignUpExisting' && !isOtpVerified && <input type="text" value={receiptNo} name="Last Receipt No" placeholder="Last Receipt No"  onChange={e => setReceiptNo(e.target.value)} />}
             
              {isOtpSent && resendOTPCount < 3 &&
-             <a href='' onClick={resendOTPHandler} disabled={resendOTPTimer > 0} >Resend OTP</a>}
+             <div>
+             <a href='' onClick={resendOTPHandler} disabled={resendOTPTimer > 0} >Resend OTP</a>
              { resendOTPTimer > 0 && <span>  in {resendOTPTimer} seconds</span> }
+             </div>}
              
             <Link >
             {screenType === 'SignUpNew' &&
