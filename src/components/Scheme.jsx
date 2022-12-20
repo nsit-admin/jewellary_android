@@ -7,13 +7,32 @@ import { Link } from "react-router-dom"
 const Scheme = ({ item }) => {
   const [expand, setExpand] = useState(false)
 
+  const getDueDate = (val) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const d = val ? new Date(val) : new Date();
+    // console.log("dude => ", months[d.getMonth()] + " " + d.getFullYear())
+    var month = d.getMonth();
+    if (month === 11) {
+      return months[d.getMonth()] + " " + (d.getFullYear() + 1).toString().substr(-2);
+    } else {
+      return months[d.getMonth() + 1] + " " + d.getFullYear().toString().substr(-2);
+    };
+  }
+
+  const getDate = (date) => {
+    console.log('date', date)
+    const d = date ? new Date(date) : new Date();
+    console.log("get dat =>", d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear())
+    return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+  }
+
   return (
     <>
       <div className="scheme">
         <div className="container">
           <div className="header">
             <div className="title">
-              <p className="schemeName">Scheme No - {item.no}</p>
+              <p className="schemeName">Scheme No - {item.chits.yrtrno}</p>
             </div>
             <Link className="expand" onClick={() => setExpand(!expand)}>
               {!expand && <ControlPointOutlinedIcon />}
@@ -25,27 +44,27 @@ const Scheme = ({ item }) => {
               <div className="values">
                 <span className="label">Name</span>
                 <br />
-                <span className="value">{item.name}</span>
+                <span className="value">{item.chits.CustName}</span>
               </div>
               <div className="values">
                 <span className="label">Chit type</span>
                 <br />
-                <span className="value">{item.chitType}</span>
+                <span className="value">{item.chits.STCode == '1' ? 'Metal' : 'Cash'}</span>
               </div>
               <div className="values">
                 <span className="label">Last Installment Paid</span>
                 <br />
-                <span className="value">{item.lastInstPaid}</span>
+                <span className="value">{item.receipts.length && item.receipts[0].InstNo ? item.receipts[0].InstNo + '/11' : '0/11'}</span>
               </div>
               <div className="values">
                 <span className="label">Last Installment Amount</span>
                 <br />
-                <span className="value">{item.lastInstDateAndAmount[1]}</span>
+                <span className="value">{item.receipts.length && item.receipts[0].TrDate && item.chits.InstAmt && getDate(item.receipts[0].TrDate) + ' - Rs: ' + item.chits.InstAmt + '/-' || '-'}</span>
               </div>
               <div className="values">
                 <span className="label">Current Due Date</span>
                 <br />
-                <span className="value">{item.currentDue[0]}</span>
+                <span className="value">{getDueDate(item.receipts[0].TrDate) + ' - Rs: ' + item.chits.InstAmt + '/-'}</span>
               </div>
             </div>
           )}
