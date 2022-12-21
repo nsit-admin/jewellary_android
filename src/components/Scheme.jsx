@@ -26,6 +26,10 @@ const Scheme = ({ item }) => {
     return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
   }
 
+  const payhandler = () => {
+    window.open('http://65.1.124.220:3002/about');
+  };
+
   return (
     <>
       <div className="scheme">
@@ -66,6 +70,11 @@ const Scheme = ({ item }) => {
                 <br />
                 <span className="value">{getDueDate(item.receipts[0].TrDate) + ' - Rs: ' + item.chits.InstAmt + '/-'}</span>
               </div>
+              {!item.receipts.length || Math.floor((new Date().getTime() - new Date(item.receipts[0].TrDate).getTime()) / (1000 * 60 * 60 * 24)) > 30 &&
+                <Link className="addSchemeBtn">
+                  <button onClick={payhandler}>Pay Scheme</button>
+                </Link>
+              }
             </div>
           )}
         </div>
