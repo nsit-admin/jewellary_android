@@ -18,7 +18,7 @@
 .addScheme .container form {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: .75rem;
   margin: 20px 0;
 }
 .addScheme .container form .inputContainer {

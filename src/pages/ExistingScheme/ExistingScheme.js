@@ -15,15 +15,20 @@ const ExistingScheme = () => {
   const [viewChits, setViewChits] = useState(false);
   const [customerPhone, setCustomerPhone] = useState('');
   const [showPayment, setShowPayment] = useState(false);
-
+  const API_URL = 'http://65.1.124.220:5000/api';
 
   useEffect(() => {
     setStoreLogin(location.state.isStoreLogin);
     setMobileNumber(location.state.mobileNumber);
+    console.log("mobile num ber", mobileNumber);
     if (!location.state.isStoreLogin && (myChits.length === 0)) {
       getMySchemes();
     }
   }, []);
+
+  const openAddScheme = () => {
+    navigate("/add-scheme", { state: { mobileNumber: mobileNumber, isStoreLogin: storeLogin, customer: myChits } });
+  }
 
   const getMySchemes = () => {
 
@@ -47,22 +52,31 @@ const ExistingScheme = () => {
   };
 
   const getCustomerSchemes = () => {
+    setMyChits([]);
+    setViewChits(false);
     if (!customerPhone) {
-      // showAlert('Kindly enter customer mobile number');
+      alert('Kindly enter customer mobile number');
+      return;
+    }
+    if (customerPhone && customerPhone.length != 10) {
+      alert('Kindly enter customer mobile number');
       return;
     }
     fetch(`http://65.1.124.220:5000/api/schemes?mobileNumber=${customerPhone}`, {
       method: 'GET',
     })
       .then(async res => {
-        setViewChits(true);
         setCustomerDtls(false);
         try {
           const jsonRes = await res.json();
           if (res.status === 200 && jsonRes.records && jsonRes.records.length > 0) {
+            setViewChits(true);
             setMyChits(jsonRes.records);
+          } else {
+            alert("Please enter a valid number");
           }
         } catch (err) {
+          setViewChits(false);
           console.log(err);
         };
       })
@@ -75,23 +89,29 @@ const ExistingScheme = () => {
   return (
     <div className="existingScheme">
       <Header />
-      <div className="heading">
-        <h2>Your Existing Schemes</h2>
-        <Link to="/add-scheme" className="addSchemeBtn">
-          <button>Add Scheme</button></Link>
-        <Link className="addSchemeBtn">
-          {/* <button onClick={payhandler} className="addSchemeBtn">Pay</button> */}
-        </Link>
 
-      </div>
       {storeLogin &&
-        <>
-          <input type="text" value={customerPhone} maxLength="10"
+        <div className="heading">
+          <input type="text" className="existingButton" value={customerPhone} maxLength="10"
             name="Name" placeholder="Customer Phone Number" onChange={e => setCustomerPhone(e.target.value)} />
-          <button type="button" onClick={getCustomerSchemes}>{'Get OTP'}</button>
-        </>
+          <button type="button" className="getExistingButton" onClick={getCustomerSchemes}>{'Get Existing'}</button>
+        </div>
       }
+      <div className="heading">
 
+        {storeLogin && viewChits &&
+          <>
+            <h2>{storeLogin ? 'Customer Scheme Details' : 'Your Existing Schemes'}</h2>
+            <button type="button" className="getExistingButton" onClick={openAddScheme}>Add Customer Scheme</button>
+          </>
+        }
+        {!storeLogin &&
+          <>
+            <h2>{storeLogin ? 'Customer Scheme Details' : 'Your Existing Schemes'}</h2>
+            <button type="button" className="getExistingButton" onClick={openAddScheme}>Add New Scheme</button>
+          </>
+        }
+      </div >
       {viewChits && <div className="schemeList">
         {myChits?.map((item, index) => (
           <Scheme item={item} key={index} />

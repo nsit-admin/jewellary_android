@@ -95,7 +95,7 @@ const Login = () => {
                         if (res.status !== 200) {
                             setIsError(true);
                             // setMessage('There was a problem. Please try again later.');
-                            alert(res.message);
+                            alert('Entered OTP is not valid/expired. Please enter the right one');
                         } else {
                             setIsOtpVerified(true);
                             if (screenType === 'SignIn') {
@@ -283,21 +283,22 @@ const Login = () => {
                     {screenType === 'SignUpNew' && <h6>Kindly provide all the below details to complete your new registration</h6>}
                     {screenType === 'SignUpNew' && !isOtpVerified && <h1>Sign Up</h1>}
                     <div className="formContainer">
-                        {(screenType === 'SignIn' || screenType === 'StoreLogin') && <input
+                        {<input
                             type="text"
                             value={mobileNumber}
                             name="phonenumber"
+                            disabled={isOtpSent}
                             placeholder="Phone Number" onChange={e => setMobileNumber(e.target.value)}
                         />}
                         {(screenType === 'StoreLogin') && <input type="password" value={password} name="password" placeholder="Enter store password" onChange={e => setPassword(e.target.value)} />}
                         {(screenType === 'SignUpNew' || screenType === 'SignIn') && isOtpSent && !isOtpVerified && <input type="password" value={otp} name="otp" placeholder="otp" onChange={e => setOtp(e.target.value)} />}
-                        {screenType === 'SignUpNew' && !isOtpVerified && <input type="text" value={customerName} name="Name" placeholder="Name" onChange={e => setCustomerName(e.target.value)} />}
-                        {screenType === 'SignUpNew' && !isOtpVerified && <input type="text" value={address1} name="Address Line 1" placeholder="Address Line 1" onChange={e => setAddress1(e.target.value)} />}
-                        {screenType === 'SignUpNew' && !isOtpVerified && <input type="text" value={address2} name="Address Line 2" placeholder="Address Line 2" onChange={e => setAddress2(e.target.value)} />}
-                        {screenType === 'SignUpNew' && !isOtpVerified && <input type="text" value={address3} name="Address Line 3" placeholder="Address Line 3" onChange={e => setAddress3(e.target.value)} />}
+                        {screenType === 'SignUpNew' && isOtpVerified && <input type="text" value={customerName} name="Name" placeholder="Name" onChange={e => setCustomerName(e.target.value)} />}
+                        {screenType === 'SignUpNew' && isOtpVerified && <input type="text" value={address1} name="Address Line 1" placeholder="Address Line 1" onChange={e => setAddress1(e.target.value)} />}
+                        {screenType === 'SignUpNew' && isOtpVerified && <input type="text" value={address2} name="Address Line 2" placeholder="Address Line 2" onChange={e => setAddress2(e.target.value)} />}
+                        {screenType === 'SignUpNew' && isOtpVerified && <input type="text" value={address3} name="Address Line 3" placeholder="Address Line 3" onChange={e => setAddress3(e.target.value)} />}
                         {screenType === 'SignUpExisting' && !isOtpVerified && <input type="text" value={receiptNo} name="Last Receipt No" placeholder="Last Receipt No" onChange={e => setReceiptNo(e.target.value)} />}
 
-                        {isOtpSent && resendOTPCount < 3 &&
+                        {isOtpSent && !isOtpVerified && resendOTPCount < 3 &&
                             <div>
                                 <a href='' onClick={resendOTPHandler} disabled={resendOTPTimer > 0} >Resend OTP</a>
                                 {resendOTPTimer > 0 && <span>  in {resendOTPTimer} seconds</span>}
@@ -306,8 +307,8 @@ const Login = () => {
                         <Link >
                             {screenType === 'SignUpNew' &&
                                 <div>
-                                    {!isOtpVerified && <button type="button" onClick={isOtpVerified ? onSubmitHandler : otpHandler}>Register</button>}
-                                    {isOtpVerified && <button type="button" onClick={isOtpVerified ? onSubmitHandler : otpHandler}>{isOtpSent ? 'Verify Phone' : 'Get OTP'}</button>}
+                                    {isOtpVerified && <button type="button" onClick={isOtpVerified ? onSubmitHandler : otpHandler}>Register</button>}
+                                    {!isOtpVerified && <button type="button" onClick={isOtpVerified ? onSubmitHandler : otpHandler}>{isOtpSent ? 'Verify Phone' : 'Get OTP'}</button>}
                                 </div>
                             }{screenType === 'SignIn' &&
                                 <div>

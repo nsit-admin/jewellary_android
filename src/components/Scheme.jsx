@@ -72,7 +72,7 @@ const Scheme = ({ item }) => {
               </div>
               {!item.receipts.length || Math.floor((new Date().getTime() - new Date(item.receipts[0].TrDate).getTime()) / (1000 * 60 * 60 * 24)) > 30 &&
                 <Link className="addSchemeBtn">
-                  <button onClick={payhandler}>Pay Scheme</button>
+                  <button type="button" onClick={payhandler}>Pay Scheme</button>
                 </Link>
               }
             </div>

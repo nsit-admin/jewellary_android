@@ -63,3 +63,15 @@
     flex-direction: column;
   }
 }/*# sourceMappingURL=Scheme.css.map */
+
+.scheme .container button {
+  position: relative;
+  padding: 10px;
+  border: 1px solid beige;
+  border-radius: 10px;
+  background-color: #f9e7fd;
+  font-weight: 500;
+  cursor: pointer;
+  width: 200px;
+  float: right;
+}
