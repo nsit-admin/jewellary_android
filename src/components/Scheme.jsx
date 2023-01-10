@@ -27,7 +27,7 @@ const Scheme = ({ item }) => {
   }
 
   const payhandler = () => {
-    window.open('http://65.1.124.220:3002/about');
+    window.open(`http://65.1.124.220:3002/about?amount=${item.chits.InstAmt}&order=${Math.floor((Math.random() * 100) + 1)}`);
   };
 
   return (
