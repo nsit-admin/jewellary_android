@@ -6,13 +6,17 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
+import "./ModalPop.css"
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AlertDialogSlide() {
-  const [open, setOpen] = React.useState(false);
+const AlertDialogSlide = (props) => {
+  // const [modalStatus, setModalStatus] = React.useState(item);
+  // const [modalTitle, setModalTitle] = React.useState(item);
+  const [open, setOpen] = React.useState(props.modalStatus);
+  console.log(props);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -24,28 +28,25 @@ export default function AlertDialogSlide() {
 
   return (
     <div>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Slide in alert dialog
-      </Button>
       <Dialog
-        open={open}
+        open={props.modalStatus}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{"Use Google's location service?"}</DialogTitle>
+        <DialogTitle className={"title-center"}>{props.modalTitle}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Let Google help apps determine location. This means sending anonymous
-            location data to Google, even when no apps are running.
+            {props.modalDesc}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose}>Agree</Button>
+          <Button onClick={props.close}>OK</Button>
         </DialogActions>
       </Dialog>
     </div>
   );
 }
+
+export default AlertDialogSlide;

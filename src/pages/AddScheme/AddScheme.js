@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import Header from "../../components/Header"
+import AlertDialogSlide from '../../components/ModalPop'
 import "./AddScheme.css"
 
 const AddScheme = () => {
@@ -18,6 +19,9 @@ const AddScheme = () => {
   const [message, setMessage] = useState('');
   const [isFormValid, setIsFormValid] = useState(true);
   const [isDefaultsSet, setIsDefaultsSet] = useState(false);
+  const [modalStatus, setModalStatus] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalDesc, setModalDesc] = useState('');
   const API_URL = 'http://65.1.124.220:5000/api';
 
   useEffect(() => {
@@ -53,7 +57,9 @@ const AddScheme = () => {
 
   const addScheme = () => {
     if (!customerName || !address1 || !address2 || !address3 || !instamt) {
-      alert('Kindly provide all the details');
+      setModalStatus(true);
+      setModalTitle('GHT');
+      setModalDesc('Kindly provide all the details');
       return;
     }
     const payload = {
@@ -79,7 +85,9 @@ const AddScheme = () => {
             navigate("/existing-scheme", { state: { mobileNumber: location.state.mobileNumber, isStoreLogin: location.state.storeLogin } });
           } else {
             // setMessage(jsonRes.message);
-            alert(jsonRes.message);
+            setModalStatus(true);
+            setModalTitle('GHT');
+            setModalDesc(jsonRes.message);
           }
         } catch (err) {
           console.log(err);
@@ -94,6 +102,11 @@ const AddScheme = () => {
 
   return (
     <div className="addScheme">
+      <AlertDialogSlide modalStatus={modalStatus}
+        modalTitle={modalTitle}
+        modalDesc={modalDesc}
+        close={() => setModalStatus(false)}
+      ></AlertDialogSlide>
       <Header />
       <div className="container">
         <p className="details">

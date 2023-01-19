@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
+import AlertDialogSlide from '../../components/ModalPop';
 import "./ExistingScheme.css"
 import Scheme from "../../components/Scheme"
 import Header from "../../components/Header"
@@ -15,6 +16,9 @@ const ExistingScheme = () => {
   const [viewChits, setViewChits] = useState(false);
   const [customerPhone, setCustomerPhone] = useState('');
   const [showPayment, setShowPayment] = useState(false);
+  const [modalStatus, setModalStatus] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalDesc, setModalDesc] = useState('');
   const API_URL = 'http://65.1.124.220:5000/api';
 
   useEffect(() => {
@@ -55,11 +59,15 @@ const ExistingScheme = () => {
     setMyChits([]);
     setViewChits(false);
     if (!customerPhone) {
-      alert('Kindly enter customer mobile number');
+      setModalStatus(true);
+      setModalTitle('GHT');
+      setModalDesc('Kindly enter customer mobile number');
       return;
     }
     if (customerPhone && customerPhone.length != 10) {
-      alert('Kindly enter customer mobile number');
+      setModalStatus(true);
+      setModalTitle('GHT');
+      setModalDesc('Kindly enter customer mobile number');
       return;
     }
     fetch(`http://65.1.124.220:5000/api/schemes?mobileNumber=${customerPhone}`, {
@@ -73,7 +81,9 @@ const ExistingScheme = () => {
             setViewChits(true);
             setMyChits(jsonRes.records);
           } else {
-            alert("Please enter a valid number");
+            setModalStatus(true);
+            setModalTitle('GHT');
+            setModalDesc("Please enter a valid number");
           }
         } catch (err) {
           setViewChits(false);
@@ -88,6 +98,11 @@ const ExistingScheme = () => {
 
   return (
     <div className="existingScheme">
+      <AlertDialogSlide modalStatus={modalStatus}
+        modalTitle={modalTitle}
+        modalDesc={modalDesc}
+        close={() => setModalStatus(false)}
+      ></AlertDialogSlide>
       <Header />
 
       {storeLogin &&

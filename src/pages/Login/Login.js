@@ -1,6 +1,7 @@
 import { Reddit } from '@mui/icons-material';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useRoute, redirect } from "react-router-dom";
+import AlertDialogSlide from '../../components/ModalPop';
 import ExistingScheme from '../ExistingScheme/ExistingScheme';
 import "./Login.css";
 
@@ -11,6 +12,10 @@ const RESEND_OTP_SECONDS = 60;
 const Login = () => {
 
     const [mobileNumber, setMobileNumber] = useState('');
+    const [modalStatus, setModalStatus] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalDesc, setModalDesc] = useState('');
+
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [receiptNo, setReceiptNo] = useState('');
@@ -41,7 +46,10 @@ const Login = () => {
                 isLogin
             };
             if (!mobileNumber) {
-                alert('please enter your phone number');
+                // setModalDesc('please enter your phone number');
+                setModalStatus(true);
+                setModalTitle('GHT');
+                setModalDesc('please enter your phone number');
                 return;
             }
             fetch(`${API_URL}${endpoint}`, {
@@ -56,7 +64,10 @@ const Login = () => {
                         if (res.status !== 200) {
                             setIsError(true);
                             // setMessage('There was a problem. Please try again later.');
-                            alert('Entered mobile number is not registerd with Guru Hasti, please register now');
+                            // setModalDesc('Entered mobile number is not registerd with Guru Hasti, please register now');
+                            setModalStatus(true);
+                            setModalTitle('GHT');
+                            setModalDesc('Entered mobile number is not registerd with Guru Hasti, please register now');
                         } else {
                             setIsOtpSent(true);
                             startResendOTPTimer();
@@ -64,14 +75,18 @@ const Login = () => {
                     } catch (err) {
                         setIsError(true);
                         // setMessage('There was a problem. Please try again later.');
-                        alert('There was a problem. Please try again later.');
+                        setModalStatus(true);
+                        setModalTitle('GHT');
+                        setModalDesc('There was a problem. Please try again later.');
                     };
                 })
                 .catch(err => {
                     console.log(err);
                     setIsError(true);
                     // setMessage('There was a problem. Please try again later.');
-                    alert('There was a problem. Please try again later.');
+                    setModalStatus(true);
+                    setModalTitle('GHT');
+                    setModalDesc('There was a problem. Please try again later.');
                 });
         } else {
             let endpoint = '/verifyOtp';
@@ -80,7 +95,9 @@ const Login = () => {
                 otp
             };
             if (!otp) {
-                alert('Kindly enter otp');
+                setModalStatus(true);
+                setModalTitle('GHT');
+                setModalDesc('Kindly enter otp');
                 return;
             }
             fetch(`${API_URL}${endpoint}`, {
@@ -95,7 +112,9 @@ const Login = () => {
                         if (res.status !== 200) {
                             setIsError(true);
                             // setMessage('There was a problem. Please try again later.');
-                            alert('Entered OTP is not valid/expired. Please enter the right one');
+                            setModalStatus(true);
+                            setModalTitle('GHT');
+                            setModalDesc('Entered OTP is not valid/expired. Please enter the right one');
                         } else {
                             setIsOtpVerified(true);
                             if (screenType === 'SignIn') {
@@ -105,14 +124,18 @@ const Login = () => {
                     } catch (err) {
                         setIsError(true);
                         // setMessage('There was a problem. Please try again later.');
-                        alert('There was a problem. Please try again later.');
+                        setModalStatus(true);
+                        setModalTitle('GHT');
+                        setModalDesc('There was a problem. Please try again later.');
                     };
                 })
                 .catch(err => {
                     console.log(err);
                     setIsError(true);
                     // setMessage('There was a problem. Please try again later.');
-                    alert('There was a problem. Please try again later.');
+                    setModalStatus(true);
+                    setModalTitle('GHT');
+                    setModalDesc('There was a problem. Please try again later.');
                 });
         }
     }
@@ -164,16 +187,20 @@ const Login = () => {
         if (payload && !Object.values(payload).every(item => item)) {
             if (screenType === 'SignIn') {
                 // setMessage('Kindly enter mobile number and password');
-                alert('Kindly enter mobile number and password');
+                setModalStatus(true);
+                setModalTitle('GHT');
+                setModalDesc('Kindly enter mobile number and password');
             } else {
                 // setMessage('Kindly provide all the details');
-                alert('Kindly provide all the details');
+                setModalStatus(true);
+                setModalTitle('GHT');
+                setModalDesc('Kindly provide all the details');
             }
             return;
         }
         // else if ((screenType === 'SignUpNew' || screenType === 'SignUpExisting') && password != confirmPassword) {
         //     // setMessage('Password and Confirm Password does not match');
-        //     showAlert('Password and Confirm Password does not match');
+        //     showsetModalDesc('Password and Confirm Password does not match');
         //     return;
         // }
         fetch(`${API_URL}${endpoint}`, {
@@ -189,27 +216,34 @@ const Login = () => {
                     if (res.status !== 200) {
                         setIsError(true);
                         // setMessage(jsonRes.message);
-                        alert(jsonRes.message);
+                        setModalStatus(true);
+                        setModalTitle('GHT');
+                        setModalDesc(jsonRes.message);
                     } else {
                         if (screenType === 'StoreLogin') {
                             navigate("/existing-scheme", { state: { mobileNumber: mobileNumber, isStoreLogin: true } });
                         } else {
                             setIsError(false);
                             // setMessage(jsonRes.message);
-                            alert(jsonRes.message);
+                            setModalStatus(true);
+                            setModalTitle('GHT');
+                            setModalDesc(jsonRes.message);
                         }
                     }
                 } catch (err) {
                     console.log(err);
                     setIsError(true);
-                    // setMessage('There was a problem. Please try again later.');
-                    alert('There was a problem. Please try again later.');
+                    setModalStatus(true);
+                    setModalTitle('GHT');
+                    setModalDesc('There was a problem. Please try again later.');
                 };
             })
             .catch(err => {
                 console.log(err);
                 setIsError(true);
-                alert('There was a problem. Please try again later.');
+                setModalStatus(true);
+                setModalTitle('GHT');
+                setModalDesc('There was a problem. Please try again later.');
             });
     };
 
@@ -234,15 +268,19 @@ const Login = () => {
                     setResendOTPCount(resendOTPCount + 1);
                     setResendOTPTimer(RESEND_OTP_SECONDS);
                     startResendOTPTimer();
-                    alert(jsonRes.message);
+                    setModalStatus(true);
+                    setModalTitle('GHT');
+                    setModalDesc(jsonRes.message);
                 } catch (err) {
-                    console.log(err);
-                    alert('There was a problem. Please try again later.');
+                    setModalStatus(true);
+                    setModalTitle('GHT');
+                    setModalDesc('There was a problem. Please try again later.');
                 };
             })
             .catch(err => {
-                console.log(err);
-                alert('There was a problem. Please try again later.');
+                setModalStatus(true);
+                setModalTitle('GHT');
+                setModalDesc('There was a problem. Please try again later.');
             });
     };
 
@@ -272,6 +310,11 @@ const Login = () => {
 
     return (
         <div className="login">
+            <AlertDialogSlide modalStatus={modalStatus}
+                modalTitle={modalTitle}
+                modalDesc={modalDesc}
+                close={() => setModalStatus(false)}
+            ></AlertDialogSlide>
             <img src="img/logo.png" alt="logo" className="logo" />
             <div className="container">
                 <img src="img/login-bg.jpeg" alt="login" />
