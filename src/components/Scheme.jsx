@@ -2,10 +2,27 @@ import React, { useState } from "react"
 import "./Scheme.css"
 import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined"
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined"
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import CloseIcon from '@mui/icons-material/Close';
+import Slide from '@mui/material/Slide';
 import { Link } from "react-router-dom"
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const Scheme = ({ item }) => {
-  const [expand, setExpand] = useState(false)
+  const [expand, setExpand] = useState(false);
+  const [openPayment, setOpenPayment] = useState(false);
+  let url = `http://65.1.124.220:3002/about?amount=${item.chits.InstAmt}&order=${Math.floor((Math.random() * 100) + 1)}`;
+  const handleClose = () => {
+    setOpenPayment(false);
+  };
 
   const getDueDate = (val) => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -27,7 +44,8 @@ const Scheme = ({ item }) => {
   }
 
   const payhandler = () => {
-    window.open(`http://65.1.124.220:3002/about?amount=${item.chits.InstAmt}&order=${Math.floor((Math.random() * 100) + 1)}`);
+    setOpenPayment(true);
+    // window.open();
   };
 
   return (
@@ -79,6 +97,41 @@ const Scheme = ({ item }) => {
           )}
         </div>
       </div>
+     <div>
+      <Dialog
+        open={openPayment}
+        TransitionComponent={Transition}
+        fullScreen
+        onClose={handleClose}
+        aria-describedby="alert-dialog-slide-description"
+      >
+                <AppBar sx={{ position: 'relative' }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleClose}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+            Payment Gateway
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <DialogContent className="iframeClass">
+          <iframe
+          allowFullScreen
+          src={url}
+          frameBorder="0"
+          height={900}
+          width={500}
+          scrolling="no"
+        />
+        </DialogContent>
+      </Dialog>
+    </div>
     </>
   )
 }

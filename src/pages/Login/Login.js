@@ -307,6 +307,12 @@ const Login = () => {
         // alert(status + message);
         return message;
     }
+    const maxLengthCheck = (object) => {
+        if (object.target.value.length > 10) {
+         object.target.value = object.target.value.slice(0, 10)
+
+          }
+        }
 
     return (
         <div className="login">
@@ -327,10 +333,12 @@ const Login = () => {
                     {screenType === 'SignUpNew' && !isOtpVerified && <h1>Sign Up</h1>}
                     <div className="formContainer">
                         {<input
-                            type="text"
+                            type="number"
                             value={mobileNumber}
                             name="phonenumber"
+                            maxLength={10}
                             disabled={isOtpSent}
+                            onInput={e => maxLengthCheck(e)}
                             placeholder="Phone Number" onChange={e => setMobileNumber(e.target.value)}
                         />}
                         {(screenType === 'StoreLogin') && <input type="password" value={password} name="password" placeholder="Enter store password" onChange={e => setPassword(e.target.value)} />}
