@@ -98,7 +98,6 @@ const signupNew = (req, res, next) => {
       MobileNo: req.body.mobileNumber,
     },
   }).then((chitUser) => {
-    console.log("chittt user...", chitUser);
     if (chitUser) {
       return res.status(409).json({
         message:
@@ -126,10 +125,6 @@ const signupNew = (req, res, next) => {
             });
           })
           .catch((err) => {
-            console.log(
-              "sorryy...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-            );
-            console.log("error", err);
             response = res
               .status(502)
               .json({ message: "error while creating the user" });
@@ -217,34 +212,6 @@ const payment = (req, res, next) => {
       } else {
         addPayment(req);
         return res.status(200).json({ message: `payment started` });
-
-        // sequelize.query('SELECT max(trno) pkey from chitrec')
-        //     .then((val) => {
-        //         let rate = '0.00';
-        //         let weight = '0.000';
-        //         if (req.body.Stcode === '1') {
-        //             // get the rate:
-
-        //         }
-        //         console.log("val -> ", val);
-        //         const pk = val[0][0].pkey
-        //         ChitRec.create({
-        //             trno: parseInt(pk) + 1,
-        //             yrtrno: req.body.chits.yrtrno,
-        //             chitno: req.body.chits.trno,
-        //             trdate: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
-        //             instno: (parseInt(req.body.receipts[0].InstNo) || 0) + 1,
-        //             instamt: req.body.chits.InstAmt,
-        //             rate: rate, // TODO - GEt it from other table during insertion
-        //             wt: weight, // TODO - Calculation to be done
-        //             DateStamp: dateformat(new Date(), "yyyy-mm-dd h:MM:ss")
-        //         }).then((ins) => {
-        //             console.log("chit rec =>", ins);
-
-        //         }).catch((err) => {
-        //             return res.status(500).json({ message: `Unexpected error occured, please try again later` });
-        //         })
-        //     });
       }
     })
     .catch((err) => {
@@ -304,7 +271,7 @@ const paymentUpdate = (req, res, next) => {
                     .query(
                       `SELECT * FROM chits c, payment_details p 
                         where c.YrTrNo = p.customer_chit_no
-                        and p.order_id = '${chtPy.order_id}'`
+                        and p.order_id = '${req.body.order_id}'`
                     )
                     .then((dd) => {
                       const chitt = dd[0][0];
@@ -341,11 +308,9 @@ const paymentUpdate = (req, res, next) => {
                                 .then((ins) => {
                                   sendPaymentSuccess(chitt.MobileNo);
                                   return res.status(200).json({
-                                    message: `payment completed for the chitNo - ${
-                                      chitt.yrtrno
-                                    }, your receipt number is ${
-                                      parseInt(pk) + 1
-                                    }`,
+                                    message: `payment completed for the chitNo - ${chitt.yrtrno
+                                      }, your receipt number is ${parseInt(pk) + 1
+                                      }`,
                                   });
                                 })
                                 .catch((err) => {
@@ -443,7 +408,6 @@ const schemesAddition = (req, res, next) => {
     .query("SELECT max(trno) pkey from chits")
     .then((val) => {
       const pk = val[0][0].pkey;
-      console.log("date => ", dateformat(new Date(), "yyyy-mm-dd h:MM:ss"));
       Chits.create({
         trdate: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
         trno: parseInt(pk) + 1,
@@ -510,7 +474,6 @@ const sendSms = (mobileNumber) => {
 };
 
 const sendOtpMsg = (mobileNumber, otp) => {
-  console.log("mob", mobileNumber, "Otp", otp);
   axios.get(
     `https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&Message=${otp}%20is%20your%20one%20time%20password%20for%20your%20phone%20verification%20with%20GURU%20HASTI%20THANGA%20MAALIGAI&MobileNumbers=${mobileNumber}%2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`
   );
@@ -532,7 +495,6 @@ const sendNewSignupMsg = (mobileNumber) => {
 };
 
 const sendOtp = (req, res, next) => {
-  console.log("req bodyy!!!!!!!!!!!!!!!!!!!!", req.body);
   if (req.body.mobileNumber === "9994501928") {
     return res
       .status(200)
@@ -544,10 +506,7 @@ const sendOtp = (req, res, next) => {
       },
     })
       .then((chits) => {
-        console.log("chitsssssssssss", chits);
-        console.log("lengthhh", chits.length);
         if (chits && chits.length && req.body.isLogin === "signup") {
-          console.log("insidee ifff");
           return res.status(401).json({
             message:
               "Provided phone number is already a customer of GHT, please click on signon",
@@ -636,10 +595,8 @@ const verifyOtp = (req, res, next) => {
         `SELECT * FROM otp where mobileNumber = ${req.body.mobileNumber} order by created_dt desc limit 1`
       )
       .then((response) => {
-        // console.log("resppp", response);
         if (response && response.length && response[0].length) {
           const otpp = response[0][0];
-          console.log("otppp", otpp.otp_code);
           OTP.update(
             {
               no_of_tries: parseInt(otpp.no_of_tries) + 1,
@@ -651,7 +608,6 @@ const verifyOtp = (req, res, next) => {
               },
             }
           );
-          //   console.log(otpp);
           if (otpp.no_of_tries > 3) {
             return res.status(300).json({
               message:
@@ -704,7 +660,7 @@ const forgotPassword = (req, res, next) => {
         });
       }
     })
-    .catch((err) => {});
+    .catch((err) => { });
 };
 
 const resendOtp = (req, res, next) => {
@@ -713,7 +669,6 @@ const resendOtp = (req, res, next) => {
       `SELECT * FROM otp where mobileNumber = ${req.query.mobileNumber} order by created_dt desc limit 1`
     )
     .then((otpRecord) => {
-      console.log(otpRecord[0][0]);
       if (otpRecord && otpRecord.length && otpRecord[0].length) {
         const sno = otpRecord[0][0].sno;
         const otp_code = otpRecord[0][0].otp_code;

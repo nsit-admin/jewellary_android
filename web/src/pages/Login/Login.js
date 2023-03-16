@@ -5,8 +5,8 @@ import AlertDialogSlide from "../../components/ModalPop";
 import ExistingScheme from "../ExistingScheme/ExistingScheme";
 import "./Login.css";
 
-// const API_URL = "https://guruhastithangamaaligai.com/api";
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://guruhastithangamaaligai.com/api";
+// const API_URL = "http://localhost:5000/api";
 const RESEND_OTP_SECONDS = 60;
 
 const Login = () => {
