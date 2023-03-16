@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize('ght', 'ghtadmin', 'Ght54321', {
+const sequelize = new Sequelize('ght_new_tmp', 'ghtadmin', 'Ght54321', {
     dialect: 'mysql',
     host: 'ght.cskltshvmkbk.ap-south-1.rds.amazonaws.com', 
 });

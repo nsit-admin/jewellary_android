@@ -1,0 +1,73 @@
+.addScheme {
+  width: 96%;
+  margin: 0 auto;
+  .container {
+    background-color: #faf8f1;
+    border-radius: 10px;
+    padding: 2rem;
+    margin: 2rem auto 0 auto;
+    width: 60%;
+    .savingType {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      margin: 20px 0;
+      .inputContainer {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+      input {
+        border: none;
+        background-color: transparent;
+        border-bottom: 1px solid rgb(90, 90, 90);
+        outline: none;
+        padding: 8px;
+        /* border-radius: 10px; */
+      }
+      select {
+        border: none;
+        background-color: transparent;
+        border-bottom: 1px solid rgb(90, 90, 90);
+        outline: none;
+        padding: 8px;
+        flex: 1;
+      }
+      button {
+        /* width: fit-content; */
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        background-color: #e7d38d;
+        font-weight: 500;
+        cursor: pointer;
+        width: 200px;
+        /* margin-top: 30px; */
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .addScheme {
+    .container {
+      width: 90%;
+      padding: 1rem;
+      form {
+        .inputContainer {
+          flex-direction: column;
+        }
+        button {
+          margin: 0 auto;
+        }
+      }
+    }
+  }
+}

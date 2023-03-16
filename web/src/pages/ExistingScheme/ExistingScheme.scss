@@ -1,0 +1,48 @@
+.existingScheme {
+  width: 96%;
+  margin: 0 auto;
+
+  .schemeList {
+    /* margin: 5rem 0; */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .heading {
+    display: flex;
+    justify-content: space-between;
+    .addSchemeBtn {
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        background-color: #faeab1;
+        font-weight: 500;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.addSchemeBtn11 {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  background-color: #faeab1;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .existingScheme {
+    .heading {
+      /* flex-direction: column; */
+      margin: 20px 0;
+      font-size: 12px;
+      align-items: center;
+    }
+  }
+}

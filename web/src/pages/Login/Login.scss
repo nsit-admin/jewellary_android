@@ -1,0 +1,101 @@
+.login {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  box-sizing: border-box;
+  .logo {
+    width: 200px;
+    border-radius: 10px;
+  }
+  .container {
+    width: 60%;
+    /* height: 400px; */
+    margin: 0 auto;
+    display: flex;
+    .form {
+      background-color: #fff9b0;
+      width: 50%;
+      border-radius: 0 10px 10px 0;
+      text-align: center;
+      color: #434242;
+      /* padding: 1rem; */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      h1 {
+        line-height: 15px;
+      }
+      span {
+        font-size: 12px;
+      }
+      .formContainer {
+        display: flex;
+        flex-direction: column;
+        justify-items: center;
+        gap: 1rem;
+        margin: 3rem 0;
+        width: 70%;
+        input {
+          border-radius: 12px;
+          border: none;
+          background-color: rgba(255, 255, 255, 0.5);
+          padding: 10px;
+          outline: none;
+        }
+        .forgotPassword {
+          text-decoration: none;
+          color: #434242;
+          cursor: pointer;
+          text-align: right;
+        }
+        button {
+          width: 100%;
+          padding: 10px;
+          border-radius: 12px;
+          border: none;
+          background-color: #434242;
+          cursor: pointer;
+          color: #fff;
+        }
+        .signup {
+          font-weight: 500;
+          text-decoration: none;
+          transition: all 5s ease;
+          color: #434242;
+          &:hover {
+            border-bottom: 2px solid #434242;
+          }
+        }
+      }
+    }
+    img {
+      width: 50%;
+      border-radius: 10px 0 0 10px;
+      object-fit: cover;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .login {
+    height: auto;
+    .container {
+      flex-direction: column;
+      width: 90%;
+      .form {
+        width: 100%;
+        border-radius: 0 0 10px 10px;
+      }
+      img {
+        width: 100%;
+        border-radius: 10px 10px 0 0;
+        height: 300px;
+      }
+    }
+  }
+}

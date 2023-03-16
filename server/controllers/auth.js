@@ -10,6 +10,8 @@ import CustMaster from '../models/custmast.js';
 import OTP from '../models/otp.js';
 import sequelize from '../utils/database.js';
 import { Op } from 'sequelize';
+import payment_details from '../models/payment_details.js';
+import rates from '../models/rate.js';
 
 
 const signupExisting = (req, res, next) => {
@@ -79,46 +81,22 @@ const signupNew = (req, res, next) => {
             if (req.body.mobileNumber) {
                 let response = '';
                 // password hash
-                sequelize.query('select max(trno) trno, yrtrno from chits')
-                    .then((val) => {
-                        Chits.create({
-                            trDate: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
-                            trno: parseInt(val[0][0].trno) + 1,
-                            yrtrno: parseInt(val[0][0].yrtrno) + 1,
-                            CustName: req.body.customerName,
-                            MobileNo: req.body.mobileNumber,
-                            Add1: req.body.address1,
-                            Add2: req.body.address2,
-                            Add3: req.body.address3,
-                            Stcode: req.body.chitType,
-                            NoI: 11,
-                            UserCode1: '0',
-                            instamt: req.body.instamt,
-                            bonus: req.body.chitType === '1' ? req.body.instamt : '0.00',
-                            Amt: 0.00,
-                            wt: 0.000,
-                            datestamp: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
-                            refno: 'TT' + parseInt(val[0][0].trno) + 1
-                        }).then(() => {
-                            CustMaster.create({
-                                CustName: req.body.customerName,
-                                MobileNo: req.body.mobileNumber,
-                                Add1: req.body.address1,
-                                Add2: req.body.address2,
-                                Add3: req.body.address3,
-                                datestamp: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
-                            }).then(() => {
-                                sendNewSignupMsg(req.body.mobileNumber);
-                                response = res.status(200).json({ message: "User has been registered successfully. Please signin to continue" });
-                            }).catch((err) => {
-                                console.log(err);
-                                response = res.status(502).json({ message: "error while creating the user" });
-                            })
-                        }).catch((err) => {
-                            console.log(err);
-                            response = res.status(502).json({ message: "error while creating the user" });
-                        })
-                    })
+                CustMaster.create({
+                    CustName: req.body.customerName,
+                    MobileNo: req.body.mobileNumber,
+                    Add1: req.body.address1,
+                    Add2: req.body.address2,
+                    Add3: req.body.address3,
+                    datestamp: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
+                }).then(() => {
+                    sendNewSignupMsg(req.body.mobileNumber);
+                    response = res.status(200).json({ message: "User has been registered successfully. Please signin to continue" });
+                }).catch((err) => {
+                    console.log(err);
+                    response = res.status(502).json({ message: "error while creating the user" });
+                })
+
+
 
                 return response;
             }
@@ -145,12 +123,18 @@ const login = (req, res, next) => {
                         res.status(502).json({ message: "error while checking user password", err });
                     } else if (compareRes) { // password match
                         const token = jwt.sign({ email: req.body.mobileNumber }, 'secret', { expiresIn: '1h' });
-                        Chits.findAll({
+                        CustMaster.findAll({
                             where: {
                                 MobileNo: req.body.mobileNumber
                             }
-                        }).then((chits) => {
-                            res.status(200).json({ message: "user logged in", chits: chits, "token": token });
+                        }).then((customer) => {
+                            Chits.findAll({
+                                where: {
+                                    MobileNo: req.body.mobileNumber
+                                }
+                            }).then((chits) => {
+                                res.status(200).json({ message: "user logged in", customer: customer, chits: chits, "token": token });
+                            })
                         })
                     } else { // password doesnt match
                         res.status(401).json({ message: "mobile number or password is not correct" });
@@ -174,33 +158,37 @@ const payment = (req, res, next) => {
             if (!dbUser) {
                 return res.status(404).json({ message: "Gateway Error" });
             } else {
-                sequelize.query('SELECT max(trno) pkey from chitrec')
-                    .then((val) => {
-                        let rate = '0.00';
-                        let weight = '0.000';
-                        if (req.body.Stcode === '1') {
-                            // get the rate: 
 
-                        }
-                        console.log("val -> ", val);
-                        const pk = val[0][0].pkey
-                        ChitRec.create({
-                            trno: parseInt(pk) + 1,
-                            yrtrno: req.body.chits.yrtrno,
-                            chitno: req.body.chits.trno,
-                            trdate: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
-                            instno: (parseInt(req.body.receipts[0].InstNo) || 0) + 1,
-                            instamt: req.body.chits.InstAmt,
-                            rate: rate, // TODO - GEt it from other table during insertion
-                            wt: weight, // TODO - Calculation to be done
-                            DateStamp: dateformat(new Date(), "yyyy-mm-dd h:MM:ss")
-                        }).then((ins) => {
-                            sendPaymentSuccess(req.body.chits.MobileNo);
-                            return res.status(200).json({ message: `payment completed for the chitNo - ${req.body.chitno}, your receipt number is ${parseInt(pk) + 1}` });
-                        }).catch((err) => {
-                            return res.status(500).json({ message: `Unexpected error occured, please try again later` });
-                        })
-                    });
+                addPayment(req);
+                return res.status(200).json({ message: `payment started` });
+
+                // sequelize.query('SELECT max(trno) pkey from chitrec')
+                //     .then((val) => {
+                //         let rate = '0.00';
+                //         let weight = '0.000';
+                //         if (req.body.Stcode === '1') {
+                //             // get the rate: 
+
+                //         }
+                //         console.log("val -> ", val);
+                //         const pk = val[0][0].pkey
+                //         ChitRec.create({
+                //             trno: parseInt(pk) + 1,
+                //             yrtrno: req.body.chits.yrtrno,
+                //             chitno: req.body.chits.trno,
+                //             trdate: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
+                //             instno: (parseInt(req.body.receipts[0].InstNo) || 0) + 1,
+                //             instamt: req.body.chits.InstAmt,
+                //             rate: rate, // TODO - GEt it from other table during insertion
+                //             wt: weight, // TODO - Calculation to be done
+                //             DateStamp: dateformat(new Date(), "yyyy-mm-dd h:MM:ss")
+                //         }).then((ins) => {
+                //             console.log("chit rec =>", ins);
+
+                //         }).catch((err) => {
+                //             return res.status(500).json({ message: `Unexpected error occured, please try again later` });
+                //         })
+                //     });
             };
         })
         .catch(err => {
@@ -208,39 +196,159 @@ const payment = (req, res, next) => {
         });
 };
 
+const paymentUpdate = (req, res, next) => {
+    // console.log(req)
+    payment_details.update({
+        tracking_id: req.body.tracking_id,
+        bank_ref_no: req.body.bank_ref_no,
+        order_status: req.body.order_status,
+        payment_mode: req.body.payment_mode,
+        status_message: req.body.tracking_id,
+        amount: req.body.amount,
+        trans_date: req.body.trans_date,
+        updated_date: dateformat(new Date(), "yyyy-mm-dd h:MM:ss")
+    }, {
+        where: {
+            order_id: req.body.order_id
+        }, returning: true,
+        plain: true
+    }).then((up) => {
+        if (req.body.order_status == 'Success') {
+
+            payment_details.findOne({
+                order_id: req.body.order_id,
+            }).then((e) => {
+                const chtPy = e.toJSON()
+                sequelize.query(`SELECT * FROM payment_details pay, chits cts
+            where pay.order_id = '${req.body.order_id}' and cts.TrNo = pay.customer_chit_no`)
+                    .then((rec) => {
+                        const vl = rec[0][0];
+                        Chits.update({
+                            InstPaid: parseInt(vl.InstPaid) + 1,
+                        }, {
+                            where: {
+                                MobileNo: vl.MobileNo,
+                                TrNo: vl.TrNo
+                            }
+                        }).then((d) => {
+
+                            sequelize.query(`SELECT * FROM chits c, payment_details p 
+                        where c.YrTrNo = p.customer_chit_no
+                        and p.order_id = '${chtPy.order_id}'`)
+                                .then((dd) => {
+                                    const chitt = dd[0][0];
+                                    sequelize.query('SELECT max(trno) pkey from chitrec')
+                                        .then((val) => {
+                                            let weight = '0.000';
+                                            sequelize.query('SELECT max(r.DateTime), r.* FROM rates r order by DateTime desc;')
+                                                .then((va) => {
+                                                    const rate = va[0][0];
+                                                    weight = Number(chitt.InstAmt) / Number(rate.GoldRate22);
+                                                    const pk = val[0][0].pkey
+                                                    ChitRec.create({
+                                                        trno: parseInt(pk) + 1,
+                                                        yrtrno: chitt.YrTrNo,
+                                                        chitno: chitt.TrNo,
+                                                        trdate: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
+                                                        instno: parseInt(vl.InstPaid) + 1,
+                                                        instamt: chitt.InstAmt,
+                                                        rate: rate.GoldRate22, // TODO - GEt it from other table during insertion
+                                                        wt: weight, // TODO - Calculation to be done
+                                                        DateStamp: dateformat(new Date(), "yyyy-mm-dd h:MM:ss")
+                                                    }).then((ins) => {
+                                                        sendPaymentSuccess(chitt.MobileNo);
+                                                        return res.status(200).json({ message: `payment completed for the chitNo - ${chitt.yrtrno}, your receipt number is ${parseInt(pk) + 1}` });
+                                                    }).catch((err) => {
+                                                        console.log(err);
+                                                        return res.status(500).json({ message: `Unexpected error occured, please try again later` });
+                                                    })
+
+                                                })
+
+                                            // }
+
+
+                                        })
+                                })
+                        })
+                    });
+
+
+
+            }).catch(err => {
+                console.log('error', err);
+            });
+        }
+    }).catch(err => {
+        console.log('error', err);
+    });
+};
+
+
+const addPayment = (req) => {
+
+    payment_details.create({
+        customer_phone: req.body.chits.MobileNo,
+        customer_chit_no: req.body.chits.trno,
+        chit_rec_id: req.body.chits.trno,
+        order_id: req.body.chits.order_id,
+        tracking_id: '',
+        bank_ref_no: '',
+        order_status: 'pending',
+        payment_mode: '',
+        status_message: 'payment started',
+        currency: 'INR',
+        amount: req.body.chits.Amt,
+        trans_date: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
+        created_date: dateformat(new Date(), "yyyy-mm-dd h:MM:ss")
+    }).then((ins) => {
+        // return res.status(200).json({ message: `payment completed for the chitNo - ${req.body.chitno}, your receipt number is ${parseInt(pk) + 1}` });
+    }).catch((err) => {
+        // return res.status(500).json({ message: `Unexpected error occured, please try again later` });
+    })
+
+}
+
 const schemes = (req, res, next) => {
     let records = [];
-    Chits.findAll({
+    CustMaster.findAll({
         where: {
-            MobileNo: req.query.mobileNumber,
-            [Op.or]: [{ setno: null }, { setno: 0 }]
-        },
-        order: [
-            ['trno', 'DESC']
-        ],
-    })
-        .then((chits) => {
-            if (chits && chits.length) {
-                chits.forEach((cr, index) => {
-                    let chit = {};
-                    sequelize.query(`SELECT cr.*, max(trdate) FROM ght.chitrec cr where chitno = ${cr.trno}`)
-                        .then((rec) => {
-                            chit['chits'] = cr;
-                            if (rec.length > 0) {
-                                chit['receipts'] = rec[0];
-                            } else {
-                                chit['receipts'] = [];
-                            }
-                            records.push(chit);
-                            if (chits.length === index + 1) {
-                                res.status(200).json({ 'records': records });
-                            }
-                        })
-                })
-            } else {
-                res.status(200).json({ chits: records });
-            }
+            MobileNo: req.query.mobileNumber
+        }
+    }).then((customer) => {
+        Chits.findAll({
+            where: {
+                MobileNo: req.query.mobileNumber,
+                [Op.or]: [{ setno: null }, { setno: 0 }]
+            },
+            order: [
+                ['trno', 'DESC']
+            ],
         })
+            .then((chits) => {
+                if (chits && chits.length) {
+                    chits.forEach((cr, index) => {
+                        let chit = {};
+                        sequelize.query(`SELECT cr.*, max(trdate) FROM chitrec cr where chitno = ${cr.trno}`)
+                            .then((rec) => {
+                                chit['chits'] = cr;
+                                if (rec.length > 0) {
+                                    chit['receipts'] = rec[0];
+                                } else {
+                                    chit['receipts'] = [];
+                                }
+                                records.push(chit);
+                                if (chits.length === index + 1) {
+                                    res.status(200).json({ 'records': records, customer: customer });
+                                }
+                            })
+                    })
+                } else {
+                    res.status(200).json({ chits: records, customer: customer });
+                }
+            })
+    })
+
 };
 
 const schemesAddition = (req, res, next) => {
@@ -397,7 +505,7 @@ const verifyOtp = (req, res, next) => {
         return res.status(200).json({ message: 'OTP verified' });
     } else {
 
-        sequelize.query(`SELECT * FROM ght.otp where mobileNumber = ${req.body.mobileNumber} and otp_code = ${req.body.otp} order by created_dt desc limit 1`)
+        sequelize.query(`SELECT * FROM otp where mobileNumber = ${req.body.mobileNumber} and otp_code = ${req.body.otp} order by created_dt desc limit 1`)
             .then((response) => {
                 // console.log(otpp)
                 if (response && response.length && response[0].length) {
@@ -448,7 +556,7 @@ const forgotPassword = (req, res, next) => {
 }
 
 const resendOtp = (req, res, next) => {
-    sequelize.query(`SELECT * FROM ght.otp where mobileNumber = ${req.query.mobileNumber} order by created_dt desc limit 1`)
+    sequelize.query(`SELECT * FROM otp where mobileNumber = ${req.query.mobileNumber} order by created_dt desc limit 1`)
         .then((otpRecord) => {
             console.log(otpRecord[0][0]);
             if (otpRecord && otpRecord.length && otpRecord[0].length) {
@@ -485,4 +593,4 @@ const resendOtp = (req, res, next) => {
     //     })
 }
 
-export { forgotPassword, signupExisting, signupNew, login, schemes, payment, isAuth, resendOtp, schemesAddition, sendSms, sendOtp, verifyOtp };
+export { forgotPassword, signupExisting, signupNew, login, schemes, payment, isAuth, resendOtp, schemesAddition, sendSms, sendOtp, verifyOtp, paymentUpdate };

@@ -1,0 +1,62 @@
+.existingScheme {
+  width: 96%;
+  margin: 0 auto;
+}
+.existingScheme .schemeList {
+  /* margin: 5rem 0; */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.existingScheme .heading {
+  display: flex;
+  justify-content: space-between;
+}
+.existingScheme .heading .addSchemeBtn button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  background-color: #faeab1;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.existingButton {
+  border-radius: 12px;
+  border: 1px solid beige;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 10px;
+  outline: none;
+}
+
+.getExistingButton {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #e7d38d;
+  font-weight: 500;
+  cursor: pointer;
+  width: 200px;
+}
+
+.addScheme .container form button {
+  /* width: fit-content; */
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #e7d38d;
+  font-weight: 500;
+  cursor: pointer;
+  width: 200px;
+  /* margin-top: 30px; */
+}
+
+@media (max-width: 767px) {
+  .existingScheme .heading {
+    /* flex-direction: column; */
+    margin: 20px 0;
+    font-size: 12px;
+    align-items: center;
+  }
+}/*# sourceMappingURL=ExistingScheme.css.map */

@@ -1,0 +1,25 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.header .logo {
+  width: 100px;
+  /* margin: 0 auto; */
+}
+.header .logout a {
+  color: #434242;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 767px) {
+  .header .logo {
+    margin: 0 auto;
+  }
+  .header .logout a span {
+    display: none;
+  }
+}/*# sourceMappingURL=Header.css.map */

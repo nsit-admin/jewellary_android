@@ -2,12 +2,13 @@ var http = require('http'),
     fs = require('fs'),
     ccav = require('./ccavutil.js'),
     crypto = require('crypto'),
+	axios = require('axios'),
     qs = require('querystring');
 
 exports.postRes = function(request,response){
     var ccavEncResponse='',
 	ccavResponse='',	
-	workingKey = '',	//Put in the 32-Bit key provided by CCAvenues.
+	workingKey = 'B8EDA202EEBB4C907D3856317E7FEE50',	//Put in the 32-Bit key provided by CCAvenues.
 	ccavPOST = '';
 
     //Generate Md5 hash for the key and then convert in base64 string
@@ -22,17 +23,38 @@ exports.postRes = function(request,response){
 	    ccavPOST =  qs.parse(ccavEncResponse);
 	    var encryption = ccavPOST.encResp;
 	    ccavResponse = ccav.decrypt(encryption, keyBase64, ivBase64);
+
+		if (ccavResponse) {
+
+			axios({
+				method: 'post',
+				url: 'https://guruhastithangamaaligai.com/api/postpayment',
+				data: ccavResponse
+			  });
+		}
+
         });
 
 	request.on('end', function () {
+
+
+
+
 	    var pData = '';
 	    pData = '<table border=1 cellspacing=2 cellpadding=2><tr><td>'	
 	    pData = pData + ccavResponse.replace(/=/gi,'</td><td>')
 	    pData = pData.replace(/&/gi,'</td></tr><tr><td>')
 	    pData = pData + '</td></tr></table>'
-            htmlcode = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Response Handler</title></head><body><center><font size="4" color="blue"><b>Response Page</b></font><br>'+ pData +'</center><br></body></html>';
-            response.writeHeader(200, {"Content-Type": "text/html"});
-	    response.write(htmlcode);
-	    response.end();
+		
+            // htmlcode = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Response Handler</title></head><body><center><font size="4" color="blue"><b>Response Page</b></font><br>'+ pData +'</center><br></body></html>';
+
+htmlcode = `<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Response Handler</title></head><body><center><font size="4" color="blue"><b>Post Payment Page</b></font><br> 
+Payment is being processed, please check after 20 minutes 
+<button onclick="window.close()"> Close this page </button>
+</center><br></body></html>`;
+
+             response.writeHeader(200, {"Content-Type": "text/html"});
+	   response.write(htmlcode);
+	   response.end();
 	}); 	
 };

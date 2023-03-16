@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  .logo {
+    width: 150px;
+    /* margin: 0 auto; */
+  }
+  .logout {
+    a {
+      color: #434242;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .header {
+    .logo {
+      margin: 0 auto;
+    }
+    .logout {
+      a {
+        span {
+          display: none;
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var http = require('http'),
+    https = require('https'),
     fs = require('fs'),
     ccav = require('./ccavutil.js'),
     qs = require('querystring'),
@@ -13,7 +14,7 @@ app.engine('html', require('ejs').renderFile);
 
 
 app.get('/about', function (req, res){
-    	res.render('dataFrom.html');
+    	res.render('test.html', {order: req.params.order, amount: req.params.amount});
 });
 
 app.post('/ccavRequestHandler', function (request, response){
