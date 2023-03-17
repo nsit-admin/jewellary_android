@@ -2,16 +2,19 @@
   width: 96%;
   margin: 0 auto;
 }
+
 .existingScheme .schemeList {
   /* margin: 5rem 0; */
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
+
 .existingScheme .heading {
   display: flex;
   justify-content: space-between;
 }
+
 .existingScheme .heading .addSchemeBtn button {
   border: none;
   border-radius: 10px;
@@ -40,6 +43,19 @@
   width: 200px;
 }
 
+.refresh {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #e7d38d;
+  font-weight: 700;
+  cursor: pointer;
+  display: block;
+  margin-right: 2px;
+  margin-left: auto;
+  margin-bottom: 5px;
+}
+
 .addScheme .container form button {
   /* width: fit-content; */
   padding: 10px;
@@ -59,4 +75,6 @@
     font-size: 12px;
     align-items: center;
   }
-}/*# sourceMappingURL=ExistingScheme.css.map */
+}
+
+/*# sourceMappingURL=ExistingScheme.css.map */

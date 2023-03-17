@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { signupExisting, signupNew, login, schemes, payment, isAuth, paymentUpdate,
-    schemesAddition, sendOtp,  verifyOtp, forgotPassword, resendOtp} from '../controllers/auth.js';
+    schemesAddition, sendOtp,  verifyOtp, forgotPassword, resendOtp, getRates} from '../controllers/auth.js';
 
 const router = express.Router();
 
@@ -26,6 +26,8 @@ router.post('/api/verifyOtp', verifyOtp);
 router.post('/api/forgot-pass', forgotPassword);
 
 router.get('/api/private', isAuth);
+
+router.get('/api/rates', getRates);
 
 router.get('/api/resendOtp', resendOtp);
 
