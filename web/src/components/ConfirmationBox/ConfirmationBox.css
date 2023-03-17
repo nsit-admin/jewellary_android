@@ -1,0 +1,14 @@
+.title-center {
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+}
+
+.confirmBtn {
+  color: green;
+}
+.cancelBtn {
+  background-color: red;
+  border-radius: 2px;
+  color: white;
+}

@@ -6,8 +6,12 @@
   background-size: 10px 10px;
 } /*# sourceMappingURL=App.css.map */
 
-@media (max-width: 767px) {
+@media (max-width: 772px) {
   .App {
     padding-bottom: 2rem;
+    background-color: brown;
+  }
+  .App::-webkit-scrollbar {
+    display: none;
   }
 }

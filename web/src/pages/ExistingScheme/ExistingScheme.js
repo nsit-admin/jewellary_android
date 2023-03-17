@@ -16,12 +16,12 @@ const ExistingScheme = () => {
   const [viewChits, setViewChits] = useState(false);
   const [customerPhone, setCustomerPhone] = useState("");
   const [showPayment, setShowPayment] = useState(false);
-  const [todayRate, setTodayRate] = useState('');
+  const [todayRate, setTodayRate] = useState("");
   const [modalStatus, setModalStatus] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
-  const [modalDesc, setModalDesc] = useState('');
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalDesc, setModalDesc] = useState("");
   const API_URL = 'https://guruhastithangamaaligai.com/api';
-  // const API_URL = 'http://localhost:5000/api';
+  //const API_URL = "http://localhost:5000/api";
 
   useEffect(() => {
     setStoreLogin(location.state.isStoreLogin);
@@ -47,17 +47,16 @@ const ExistingScheme = () => {
 
   const refresh = () => {
     storeLogin ? getCustomerSchemes() : getMySchemes();
-  }
+  };
 
   const getRates = () => {
     fetch(`${API_URL}/rates`, {
-      method: 'GET',
-    })
-      .then(async res => {
-        const jsonRes = await res.json();
-        setTodayRate(jsonRes.rates[0].GoldRate22);
-      })
-  }
+      method: "GET",
+    }).then(async (res) => {
+      const jsonRes = await res.json();
+      setTodayRate(jsonRes.rates[0].GoldRate22);
+    });
+  };
 
   const getMySchemes = () => {
     fetch(`${API_URL}/schemes?mobileNumber=${location.state.mobileNumber}`, {
@@ -150,7 +149,9 @@ const ExistingScheme = () => {
         close={() => setModalStatus(false)}></AlertDialogSlide>
       <Header />
 
-      <h4>{'Gold Rate - (22 Carat) - Rs: '} {todayRate}</h4>
+      <h4>
+        {"Gold Rate - (22 Carat) - Rs: "} {todayRate}
+      </h4>
       {storeLogin && (
         <div className="heading">
           <input
@@ -169,8 +170,7 @@ const ExistingScheme = () => {
             {"Get Existing"}
           </button>
         </div>
-      )
-      }
+      )}
       <div className="heading">
         {storeLogin && viewChits && (
           <>
@@ -198,14 +198,23 @@ const ExistingScheme = () => {
             </button>
           </>
         )}
-
-      </div >
-      <button type="button" className="refresh" onClick={refresh}>Refresh</button>
-      {viewChits && <div className="schemeList">
-        {myChits?.map((item, index) => (
-          <Scheme item={item} key={index} />
-        ))}
-      </div>}
+      </div>
+      <button
+        type="button"
+        className="refresh"
+        onClick={refresh}>
+        Refresh
+      </button>
+      {viewChits && (
+        <div className="schemeList">
+          {myChits?.map((item, index) => (
+            <Scheme
+              item={item}
+              key={index}
+            />
+          ))}
+        </div>
+      )}
       {viewChits && (
         <div className="schemeList">
           {myChits?.map((item, index) => (
