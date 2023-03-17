@@ -279,12 +279,12 @@ const paymentUpdate = (req, res, next) => {
                         .query("SELECT max(trno) pkey from chitrec")
                         .then((val) => {
                           let weight = "0.000";
-                          sequelize
-                            .query(
-                              "SELECT max(r.DateTime), r.* FROM rates r order by DateTime desc;"
-                            )
+                          rates.findAll({
+                            limit: 1,
+                            order: [[sequelize.col('DateTime'), 'DESC']],
+                          })
                             .then((va) => {
-                              const rate = va[0][0];
+                              const rate = va[0];
                               weight =
                                 Number(chitt.InstAmt) / Number(rate.GoldRate22);
                               const pk = val[0][0].pkey;
@@ -709,6 +709,16 @@ const resendOtp = (req, res, next) => {
   //     })
 };
 
+const getRates = (req, res, next) => {
+  rates.findAll({
+    limit: 1,
+    order: [[sequelize.col('DateTime'), 'DESC']],
+  })
+    .then((rates) => {
+      res.status(200).json({ rates: rates });
+    })
+}
+
 export {
   forgotPassword,
   signupExisting,
@@ -723,4 +733,5 @@ export {
   sendOtp,
   verifyOtp,
   paymentUpdate,
+  getRates,
 };
