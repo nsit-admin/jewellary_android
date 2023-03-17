@@ -22,7 +22,6 @@ const AlertDialogSlide = (props) => {
   };
 
   const handleClose = () => {
-    console.log("handleClose called");
     if (props.modalDesc == 'User has been registered successfully. Please signin to continue') {
       window.location.reload(false);
     }

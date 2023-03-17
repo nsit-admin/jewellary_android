@@ -85,13 +85,6 @@
   .login {
     height: auto;
   }
-  body {
-    overflow-y: hidden;
-  }
-  .container {
-    /* max-height: 70%; */
-    height: 70px;
-  }
   .form h4 {
     margin-top: 3px;
     margin-bottom: 2px;
@@ -102,6 +95,7 @@
   .login .container {
     flex-direction: column;
     width: 90%;
+    height: 70px;
   }
   .login .container .form {
     width: 100%;

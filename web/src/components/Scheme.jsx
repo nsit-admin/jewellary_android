@@ -55,7 +55,6 @@ const Scheme = ({ item }) => {
       "Dec",
     ];
     const d = val ? new Date(val) : new Date();
-    console.log("dude => ", months[d.getMonth()] + " " + d.getFullYear());
     var month = d.getMonth();
     if (month === 11) {
       return (
@@ -69,12 +68,7 @@ const Scheme = ({ item }) => {
   };
 
   const getDate = (date) => {
-    console.log("date", date);
     const d = date ? new Date(date) : new Date();
-    console.log(
-      "get dat =>",
-      d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear()
-    );
     return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
   };
 
@@ -137,9 +131,9 @@ const Scheme = ({ item }) => {
                     item.receipts[0].TrDate &&
                     item.chits.InstAmt &&
                     getDate(item.receipts[0].TrDate) +
-                      " - Rs: " +
-                      item.chits.InstAmt +
-                      "/-") ||
+                    " - Rs: " +
+                    item.chits.InstAmt +
+                    "/-") ||
                     "-"}
                 </span>
               </div>
@@ -157,16 +151,16 @@ const Scheme = ({ item }) => {
                 (Math.floor(
                   (new Date().getTime() -
                     new Date(item.receipts[0].TrDate).getTime()) /
-                    (1000 * 60 * 60 * 24)
+                  (1000 * 60 * 60 * 24)
                 ) > 30 && (
-                  <Link className="addSchemeBtn">
-                    <button
-                      type="button"
-                      onClick={payhandler}>
-                      Pay Scheme
-                    </button>
-                  </Link>
-                ))}
+                    <Link className="addSchemeBtn">
+                      <button
+                        type="button"
+                        onClick={payhandler}>
+                        Pay Scheme
+                      </button>
+                    </Link>
+                  ))}
             </div>
           )}
         </div>
