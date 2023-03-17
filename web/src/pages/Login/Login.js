@@ -32,7 +32,7 @@ const Login = () => {
   const [resendOTPCount, setResendOTPCount] = useState(0);
   const [disabledResendBtn, setdisabledResendBtn] = useState(true);
 
-  useEffect(() => {});
+  useEffect(() => { });
 
   const navigate = useNavigate();
   const otpHandler = () => {
@@ -60,18 +60,11 @@ const Login = () => {
       })
         // .then((data) => data.json())
         .then(async (res) => {
-          console.log("respp", res);
           try {
             if (res.status !== 200) {
-              console.log("resssss json", res);
               setIsError(true);
-              // setMessage('There was a problem. Please try again later.');
-              // setModalDesc('Entered mobile number is not registerd with Guru Hasti, please register now');
               setModalStatus(true);
               setModalTitle("GHT");
-              //   setModalDesc(
-              //     "Entered mobile number is not registerd with Guru Hasti, please register now"
-              //   );
               if (res.status === 402) {
                 setModalDesc(
                   "Entered mobile number is not registerd with Guru Hasti, please register now"
@@ -82,7 +75,6 @@ const Login = () => {
                 );
               }
             } else {
-              console.log("elseee res", res);
               setIsOtpSent(true);
               startResendOTPTimer();
             }

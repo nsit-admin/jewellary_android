@@ -33,8 +33,6 @@ const ExistingScheme = () => {
   }, []);
 
   const openAddScheme = () => {
-    console.log("store login", storeLogin);
-    console.log("customer exist", customer);
     navigate("/add-scheme", {
       state: {
         mobileNumber: mobileNumber,
@@ -59,15 +57,14 @@ const ExistingScheme = () => {
   };
 
   const getMySchemes = () => {
-    fetch(`${API_URL}/schemes?mobileNumber=${location.state.mobileNumber}`, {
+    let moNum = mobileNumber || location.state.mobileNumber
+    fetch(`${API_URL}/schemes?mobileNumber=${moNum}`, {
       method: "GET",
     })
       .then(async (res) => {
-        console.log("resppp", res);
         setViewChits(true);
         try {
           const jsonRes = await res.json();
-          console.log("jsonRes: ", jsonRes);
           if (
             res.status === 200 &&
             jsonRes.records &&
@@ -80,7 +77,6 @@ const ExistingScheme = () => {
             jsonRes.customer &&
             jsonRes.customer.length > 0
           ) {
-            console.log(" customer => ", jsonRes.customer);
             setCustomer(jsonRes.customer);
           }
         } catch (err) {
@@ -114,7 +110,6 @@ const ExistingScheme = () => {
         setCustomerDtls(false);
         try {
           const jsonRes = await res.json();
-          console.log("jsonRes", jsonRes);
           if (
             res.status === 200 &&
             jsonRes.records &&
@@ -215,6 +210,9 @@ const ExistingScheme = () => {
           ))}
         </div>
       )}
+
+      </div >
+      <button type="button" className="refresh" onClick={refresh}>Refresh</button>
       {viewChits && (
         <div className="schemeList">
           {myChits?.map((item, index) => (

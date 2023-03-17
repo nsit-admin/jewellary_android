@@ -28,9 +28,7 @@ const AddScheme = () => {
   useEffect(() => {
     setStoreLogin(location.state.isStoreLogin);
     setMobileNumber(location.state.mobileNumber);
-    console.log("cusmer addsc", location.state.customer);
     var customer = location.state.customer[0];
-    console.log("====> ", customer);
     if (customer && !isDefaultsSet) {
       setMobileNumber(customer.MobileNo);
       setCustomerName(customer.CustName);
