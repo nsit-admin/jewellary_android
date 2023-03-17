@@ -6,6 +6,7 @@ const rates = sequelize.define('rates', {
    DateTime: {
       type: Sequelize.STRING,
       allowNull: false,
+      primaryKey: true
    },
    GoldRate22: {
       type: Sequelize.STRING,
