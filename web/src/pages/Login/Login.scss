@@ -81,12 +81,14 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 770px) {
   .login {
-    height: auto;
+    height: fit-content;
+
     .container {
       flex-direction: column;
       width: 90%;
+
       .form {
         width: 100%;
         border-radius: 0 0 10px 10px;
