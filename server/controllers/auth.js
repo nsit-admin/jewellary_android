@@ -308,9 +308,11 @@ const paymentUpdate = (req, res, next) => {
                                 .then((ins) => {
                                   sendPaymentSuccess(chitt.MobileNo);
                                   return res.status(200).json({
-                                    message: `payment completed for the chitNo - ${chitt.yrtrno
-                                      }, your receipt number is ${parseInt(pk) + 1
-                                      }`,
+                                    message: `payment completed for the chitNo - ${
+                                      chitt.yrtrno
+                                    }, your receipt number is ${
+                                      parseInt(pk) + 1
+                                    }`,
                                   });
                                 })
                                 .catch((err) => {
@@ -369,6 +371,7 @@ const schemes = (req, res, next) => {
       MobileNo: req.query.mobileNumber,
     },
   }).then((customer) => {
+    console.log("custom", customer);
     Chits.findAll({
       where: {
         MobileNo: req.query.mobileNumber,
@@ -660,7 +663,7 @@ const forgotPassword = (req, res, next) => {
         });
       }
     })
-    .catch((err) => { });
+    .catch((err) => {});
 };
 
 const resendOtp = (req, res, next) => {
