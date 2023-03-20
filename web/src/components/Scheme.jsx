@@ -22,10 +22,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   );
 });
 
-const Scheme = ({ item }) => {
+const Scheme = ({ item, expandedChitNo, onExpand }) => {
   const API_URL = "https://guruhastithangamaaligai.com/api";
   // const API_URL = "http://localhost:5000/api";
-  const [expand, setExpand] = useState(false);
   const [openPayment, setOpenPayment] = useState(false);
   const orderId =
     Math.floor(Math.random() * 10000 + 1) +
@@ -95,12 +94,12 @@ const Scheme = ({ item }) => {
             </div>
             <Link
               className="expand"
-              onClick={() => setExpand(!expand)}>
-              {!expand && <ControlPointOutlinedIcon />}
-              {expand && <RemoveCircleOutlineOutlinedIcon />}
+              onClick={() => onExpand(item.chits.yrtrno)}>
+              {!(expandedChitNo === item.chits.yrtrno) && <ControlPointOutlinedIcon />}
+              {(expandedChitNo === item.chits.yrtrno) && <RemoveCircleOutlineOutlinedIcon />}
             </Link>
           </div>
-          {expand && (
+          {(expandedChitNo === item.chits.yrtrno) && (
             <div className="content">
               <div className="values">
                 <span className="label">Name</span>

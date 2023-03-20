@@ -20,6 +20,7 @@ const ExistingScheme = () => {
   const [modalStatus, setModalStatus] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalDesc, setModalDesc] = useState('');
+  const [expandedChitNo, setExpandedChitNo] = useState('');
   const API_URL = 'https://guruhastithangamaaligai.com/api';
   // const API_URL = 'http://localhost:5000/api';
 
@@ -207,6 +208,8 @@ const ExistingScheme = () => {
             <Scheme
               item={item}
               key={index}
+              expandedChitNo={expandedChitNo}
+              onExpand={(e)=>setExpandedChitNo(e === expandedChitNo ? '' : e)}
             />
           ))}
         </div>
