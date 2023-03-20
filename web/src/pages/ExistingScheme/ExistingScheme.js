@@ -26,8 +26,11 @@ const ExistingScheme = () => {
   useEffect(() => {
     setStoreLogin(location.state.isStoreLogin);
     setMobileNumber(location.state.mobileNumber);
-    if (!location.state.isStoreLogin && myChits.length === 0) {
+    if (!location.state.isStoreLogin) {
       getMySchemes();
+    } else if (location.state.fromAdd) {
+      setCustomerPhone(location.state.mobileNumber)
+      getCustomerSchemes();
     }
     getRates();
   }, []);
@@ -53,7 +56,7 @@ const ExistingScheme = () => {
     })
       .then(async res => {
         const jsonRes = await res.json();
-        setTodayRate(jsonRes.rates[0].GoldRate22);
+        setTodayRate(jsonRes?.rates[0]?.GoldRate22.split(".")[0]);
       })
   }
 
@@ -92,19 +95,21 @@ const ExistingScheme = () => {
   const getCustomerSchemes = () => {
     setMyChits([]);
     setViewChits(false);
-    if (!customerPhone) {
+    if (!customerPhone && !location.state.mobileNumber) {
       setModalStatus(true);
       setModalTitle("GHT");
       setModalDesc("Kindly enter customer mobile number");
       return;
     }
-    if (customerPhone && customerPhone.length != 10) {
+    if ((customerPhone && customerPhone.length != 10) || (location.state?.mobileNumber && location.state?.mobileNumber.length != 10)) {
+
       setModalStatus(true);
       setModalTitle("GHT");
       setModalDesc("Kindly enter Valid  mobile number of Customer");
       return;
     }
-    fetch(`${API_URL}/schemes?mobileNumber=${customerPhone}`, {
+    let custPh = customerPhone || location.state.mobileNumber;
+    fetch(`${API_URL}/schemes?mobileNumber=${custPh}`, {
       method: "GET",
     })
       .then(async (res) => {

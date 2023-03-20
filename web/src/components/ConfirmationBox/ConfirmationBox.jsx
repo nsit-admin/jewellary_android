@@ -15,11 +15,9 @@ const ConfirmationBox = (props) => {
   const [open, setOpen] = React.useState(props.modalStatus);
 
   const handleLogout = () => {
-    console.log("logout");
     navigate("/");
   };
   const handleClose = () => {
-    console.log("Close");
     props.close();
     setOpen(false);
   };

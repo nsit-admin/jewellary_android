@@ -52,7 +52,7 @@ const AddScheme = () => {
 
   const goBack = () => {
     navigate("/existing-scheme", {
-      state: { mobileNumber: mobileNumber, isStoreLogin: storeLogin },
+      state: { mobileNumber: mobileNumber, isStoreLogin: storeLogin, fromAdd: true },
     });
   };
 
@@ -84,10 +84,7 @@ const AddScheme = () => {
           const jsonRes = await res.json();
           if (res.status === 200) {
             navigate("/existing-scheme", {
-              state: {
-                mobileNumber: location.state.mobileNumber,
-                isStoreLogin: location.state.storeLogin,
-              },
+              state: { mobileNumber: mobileNumber, isStoreLogin: storeLogin, fromAdd: true },
             });
           } else {
             // setMessage(jsonRes.message);
