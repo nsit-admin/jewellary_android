@@ -24,8 +24,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) => {
-  // const API_URL = "https://guruhastithangamaaligai.com/api";
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = "https://guruhastithangamaaligai.com/api";
+  // const API_URL = "http://localhost:5000/api";
   const [openPayment, setOpenPayment] = useState(false);
   const [modalStatus, setModalStatus] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -58,6 +58,7 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
       "Dec",
     ];
     const d = val ? new Date(val) : new Date();
+    console.log(months[d.getMonth()] + " " + (d.getFullYear() + 1).toString().substr(-2))
     var month = d.getMonth();
     if (month === 11) {
       return (
@@ -65,7 +66,7 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
       );
     } else {
       return (
-        months[d.getMonth() + 1] + " " + d.getFullYear().toString().substr(-2)
+        months[d.getMonth()] + " " + d.getFullYear().toString().substr(-2)
       );
     }
   };
@@ -83,10 +84,9 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
         "Content-Type": "application/json",
       },
       body: JSON.stringify(item),
-    });
-    setTimeout(() => {
+    }).then(() => {
       onComplete(true);
-    }, 1000);
+    });
   }
 
   const payhandler = () => {
@@ -124,7 +124,8 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
         modalStatus={modalStatus}
         modalTitle={modalTitle}
         modalDesc={modalDesc}
-        close={() => setModalStatus(false)}></AlertDialogSlide>
+        close={() => setModalStatus(false)}>
+      </AlertDialogSlide>
       <div className="scheme">
         <div className="container">
           <div className="header">
@@ -146,7 +147,7 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
                 <span className="value">{item.chits.CustName}</span>
               </div>
               <div className="values">
-                <span className="label">Chit type</span>
+                <span className="label">Saving type</span>
                 <br />
                 <span className="value">
                   {item.chits.STCode == "1" ? "Metal" : "Cash"}
@@ -170,18 +171,18 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
                     item.chits.InstAmt &&
                     getDate(item.receipts[0].TrDate) +
                     " - Rs: " +
-                    item.chits.InstAmt +
+                    item.chits?.InstAmt?.split(".")[0] +
                     "/-") ||
                     "-"}
                 </span>
               </div>
               <div className="values">
-                <span className="label">Current Due Date</span>
+                <span className="label">Current Due</span>
                 <br />
                 <span className="value">
                   {getDueDate(item.receipts[0].TrDate) +
                     " - Rs: " +
-                    item.chits.InstAmt +
+                    item.chits?.InstAmt?.split(".")[0] +
                     "/-"}
                 </span>
               </div>

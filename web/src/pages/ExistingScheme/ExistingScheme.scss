@@ -36,6 +36,10 @@
   cursor: pointer;
 }
 
+input, select, textarea{
+  color: #ff0000;
+}
+
 @media (max-width: 767px) {
   .existingScheme {
     .heading {

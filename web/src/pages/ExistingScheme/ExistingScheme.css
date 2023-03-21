@@ -68,6 +68,11 @@
   /* margin-top: 30px; */
 }
 
+.existingButton, select, textarea{
+  color: blue;
+  font-weight: 700;
+}
+
 @media (max-width: 767px) {
   .existingScheme .heading {
     /* flex-direction: column; */
