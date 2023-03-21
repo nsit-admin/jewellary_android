@@ -58,7 +58,6 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
       "Dec",
     ];
     const d = val ? new Date(val) : new Date();
-    console.log(months[d.getMonth()] + " " + (d.getFullYear() + 1).toString().substr(-2))
     var month = d.getMonth();
     if (month === 11) {
       return (
@@ -77,7 +76,6 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
   };
 
   const payCash = () => {
-    console.log(item);
     fetch(`${API_URL}/cashPayment`, {
       method: "POST",
       headers: {
