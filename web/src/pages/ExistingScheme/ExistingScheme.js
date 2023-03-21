@@ -209,6 +209,8 @@ const ExistingScheme = () => {
               item={item}
               key={index}
               expandedChitNo={expandedChitNo}
+              isStoreLogin={storeLogin}
+              onComplete={(e)=> refresh()}
               onExpand={(e)=>setExpandedChitNo(e === expandedChitNo ? '' : e)}
             />
           ))}

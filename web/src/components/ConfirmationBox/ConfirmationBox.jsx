@@ -39,10 +39,11 @@ const ConfirmationBox = (props) => {
           <Button
             onClick={handleLogout}
             style={{
-              borderRadius: 25,
-              backgroundColor: "#21b6ae",
+              borderRadius: 10,
+              backgroundColor: "#e7d38d",
               padding: "4px 8px",
               fontSize: "14px",
+              color: "black"
             }}
             variant="contained">
             OK
@@ -50,10 +51,11 @@ const ConfirmationBox = (props) => {
           <Button
             onClick={handleClose}
             style={{
-              borderRadius: 25,
-              backgroundColor: "#F95219",
+              borderRadius: 10,
+              backgroundColor: "#e7d38d",
               padding: "4px 8px",
               fontSize: "14px",
+              color: "black"
             }}
             variant="contained">
             CANCEL

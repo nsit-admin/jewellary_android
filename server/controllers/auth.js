@@ -285,8 +285,10 @@ const paymentUpdate = (req, res, next) => {
                           })
                             .then((va) => {
                               const rate = va[0];
-                              weight =
-                                Number(chitt.InstAmt) / Number(rate.GoldRate22);
+                              if (chitt.STCode == 1) {
+                                weight =
+                                  Number(chitt.InstAmt) / Number(rate.GoldRate22);
+                              }
                               const pk = val[0][0].pkey;
                               ChitRec.create({
                                 trno: parseInt(pk) + 1,
@@ -298,6 +300,7 @@ const paymentUpdate = (req, res, next) => {
                                 ),
                                 instno: parseInt(vl.InstPaid) + 1,
                                 instamt: chitt.InstAmt,
+                                remarks: 'ONLINE PAYMENT',
                                 rate: rate.GoldRate22, // TODO - GEt it from other table during insertion
                                 wt: weight, // TODO - Calculation to be done
                                 DateStamp: dateformat(
@@ -308,11 +311,9 @@ const paymentUpdate = (req, res, next) => {
                                 .then((ins) => {
                                   sendPaymentSuccess(chitt.MobileNo);
                                   return res.status(200).json({
-                                    message: `payment completed for the chitNo - ${
-                                      chitt.yrtrno
-                                    }, your receipt number is ${
-                                      parseInt(pk) + 1
-                                    }`,
+                                    message: `payment completed for the chitNo - ${chitt.yrtrno
+                                      }, your receipt number is ${parseInt(pk) + 1
+                                      }`,
                                   });
                                 })
                                 .catch((err) => {
@@ -424,7 +425,7 @@ const schemesAddition = (req, res, next) => {
         NoI: 11,
         UserCode1: "0",
         InstAmt: req.body.instamt,
-        Bonus: req.body.chitType === "1" ? req.body.instamt : "0.00",
+        Bonus: req.body.chitType === "2" ? req.body.instamt : "0.00",
         Amt: 0.0,
         Wt: 0.0,
         DateStamp: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
@@ -483,18 +484,11 @@ const sendOtpMsg = (mobileNumber, otp) => {
 };
 
 const sendPaymentSuccess = (mobileNumber) => {
-  axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&
-        Message=Dear%20Customer,%20Thank%20you%20for%20the%20payment%20of%20your%20monthly%20saving%20scheme%20
-        with%20GURU%20HASTI%20THANGA%20MAALIGAI.%20Please%20pay%20on%20time%20regularly%20to%20avail%20exciting%20offers!&
-        MobileNumbers=${mobileNumber}
-        %2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
+  axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&Message=Dear%20Customer,%20Thank%20you%20for%20the%20payment%20of%20your%20monthly%20saving%20scheme%20with%20GURU%20HASTI%20THANGA%20MAALIGAI.%20Please%20pay%20on%20time%20regularly%20to%20avail%20exciting%20offers!&MobileNumbers=${mobileNumber}%2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
 };
 
 const sendNewSignupMsg = (mobileNumber) => {
-  axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&
-        Message=We%20value%20your%20relationship%20with%20GURU%20HASTI%20THANGA%20MAALIGAI%20by%20joining%20our%20monthly%20saving%20scheme%20today.%20Please%20pay%20regularly%20to%20avail%20exciting%20offers!&
-        MobileNumbers=${mobileNumber}
-        %2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
+  axios.get(`https://sms.nettyfish.com/api/v2/SendSMS?SenderId=GHTGHT&Message=We%20value%20your%20relationship%20with%20GURU%20HASTI%20THANGA%20MAALIGAI%20by%20joining%20our%20monthly%20saving%20scheme%20today.%20Please%20pay%20regularly%20to%20avail%20exciting%20offers!&MobileNumbers=${mobileNumber}%2C8608666111&ApiKey=fabf013b-3389-4feb-a4bd-d80e28b3968d&ClientId=eb334565-1b99-4ba1-a0c7-8fb7709fbd82`);
 };
 
 const sendOtp = (req, res, next) => {
@@ -663,7 +657,7 @@ const forgotPassword = (req, res, next) => {
         });
       }
     })
-    .catch((err) => {});
+    .catch((err) => { });
 };
 
 const resendOtp = (req, res, next) => {
@@ -694,19 +688,6 @@ const resendOtp = (req, res, next) => {
         res.status(400).json({ message: "unexpected error occured" });
       }
     });
-  // sequelize.query(`select chtrec.*, max(chtrec.DateStamp) from chits chts, chitrec chtrec, mobile_customers mcs where mcs.mobileNumber = chts.MobileNo and chts.MobileNo =
-  //     ${req.body.mobileNumber} and chtrec.trno = ${req.body.receiptNo} and chts.TrNo = chtrec.ChitNo group by chtrec.ChitNo`)
-  //     .then(chitReceipt => {
-  //         if (chitReceipt.length && chitReceipt[0].length) {
-  //             // TODO
-  //             // send the password thru SMS
-  //             res.status(200).json({ message: 'SMS will be sent to the registered phone number' });
-  //         } else {
-  //             res.status(200).json({ message: 'SMS will be sent to the registered phone number if the data provided is valid' });
-  //         }
-  //     })
-  //     .catch(err => {
-  //     })
 };
 
 const getRates = (req, res, next) => {
@@ -718,6 +699,99 @@ const getRates = (req, res, next) => {
       res.status(200).json({ rates: rates });
     })
 }
+
+
+const cashPayment = (req, res, next) => {
+  let chit = req.body.chits;
+  Chits.update(
+    {
+      InstPaid: parseInt(chit.InstPaid) + 1,
+    },
+    {
+      where: {
+        MobileNo: chit.MobileNo,
+        TrNo: chit.trno,
+      },
+    }
+  ).then((d) => {
+    sequelize
+      .query("SELECT max(trno) pkey from chitrec")
+      .then((val) => {
+        let weight = "0.000";
+        rates.findAll({
+          limit: 1,
+          order: [[sequelize.col('DateTime'), 'DESC']],
+        })
+          .then((va) => {
+            const rate = va[0];
+            if (chit.STCode == 1) {
+              weight =
+                Number(chit.InstAmt) / Number(rate.GoldRate22);
+            }
+            const pk = val[0][0].pkey;
+            ChitRec.create({
+              trno: parseInt(pk) + 1,
+              yrtrno: chit.yrtrno,
+              chitno: chit.trno,
+              trdate: dateformat(
+                new Date(),
+                "yyyy-mm-dd h:MM:ss"
+              ),
+              instno: parseInt(chit.InstPaid) + 1,
+              instamt: chit.InstAmt,
+              remarks: 'CASH',
+              rate: rate.GoldRate22, // TODO - GEt it from other table during insertion
+              wt: weight, // TODO - Calculation to be done
+              DateStamp: dateformat(
+                new Date(),
+                "yyyy-mm-dd h:MM:ss"
+              ),
+            })
+              .then((ins) => {
+                sendPaymentSuccess(chit.MobileNo);
+                return res.status(200).json({
+                  message: `payment completed for the chitNo - ${chit.yrtrno
+                    }, your receipt number is ${parseInt(pk) + 1
+                    }`,
+                });
+              })
+              .catch((err) => {
+                console.log(err);
+                return res.status(500).json({
+                  message: `Unexpected error occured, please try again later`,
+                });
+              });
+          });
+      });
+  });
+};
+
+const paymentStatus = (req, res, next) => {
+  // console.log(req)
+  ChitRec.findAll({
+    limit: 1,
+    where: {
+      yrtrno: req.body.chits.yrtrno,
+    },
+    order: [[sequelize.col('DateStamp'), 'DESC']],
+  })
+    .then((dbVal) => {
+      const rec = dbVal[0];
+      if (!rec) {
+        return res.status(200).json({ paymentAllowed: true });
+      } else if (Math.floor(
+        (new Date().getTime() - new Date(rec.trdate).getTime()) / (1000 * 60 * 60 * 24)) > 30) {
+        return res.status(200).json({ paymentAllowed: true });
+      } else {
+        return res.status(200).json({ paymentAllowed: false });
+      }
+    })
+    .catch((err) => {
+      console.log("error", err);
+    });
+};
+
+
 
 export {
   forgotPassword,
@@ -734,4 +808,6 @@ export {
   verifyOtp,
   paymentUpdate,
   getRates,
+  cashPayment,
+  paymentStatus
 };

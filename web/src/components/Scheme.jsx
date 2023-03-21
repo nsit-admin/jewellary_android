@@ -10,6 +10,7 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
+import AlertDialogSlide from "../../src/components/ModalPop";
 import Slide from "@mui/material/Slide";
 import { Link } from "react-router-dom";
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -22,10 +23,13 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   );
 });
 
-const Scheme = ({ item, expandedChitNo, onExpand }) => {
-  const API_URL = "https://guruhastithangamaaligai.com/api";
-  // const API_URL = "http://localhost:5000/api";
+const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) => {
+  // const API_URL = "https://guruhastithangamaaligai.com/api";
+  const API_URL = "http://localhost:5000/api";
   const [openPayment, setOpenPayment] = useState(false);
+  const [modalStatus, setModalStatus] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalDesc, setModalDesc] = useState('');
   const orderId =
     Math.floor(Math.random() * 10000 + 1) +
     "_" +
@@ -71,21 +75,56 @@ const Scheme = ({ item, expandedChitNo, onExpand }) => {
     return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
   };
 
-  const payhandler = () => {
-    setOpenPayment(true);
-    fetch(`${API_URL}/payment`, {
+  const payCash = () => {
+    console.log(item);
+    fetch(`${API_URL}/cashPayment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(item),
     });
+    setTimeout(() => {
+      onComplete(true);
+    }, 1000);
+  }
 
-    window.open(url, "_blank");
+  const payhandler = () => {
+    fetch(`${API_URL}/paymentStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(item),
+    })
+      .then(async (res) => {
+        const jsonRes = await res.json();
+        if (jsonRes.paymentAllowed) {
+          fetch(`${API_URL}/payment`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(item),
+          }).then(() => {
+            setOpenPayment(true);
+            window.open(url, "_blank");
+          });
+        } else {
+          setModalStatus(true);
+          setModalTitle("GHT");
+          setModalDesc("Payment is already in process or completed, Please refresh or check after 20 mins");
+        }
+      })
   };
 
   return (
     <>
+      <AlertDialogSlide
+        modalStatus={modalStatus}
+        modalTitle={modalTitle}
+        modalDesc={modalDesc}
+        close={() => setModalStatus(false)}></AlertDialogSlide>
       <div className="scheme">
         <div className="container">
           <div className="header">
@@ -158,6 +197,13 @@ const Scheme = ({ item, expandedChitNo, onExpand }) => {
                         onClick={payhandler}>
                         Pay Scheme
                       </button>
+                      {isStoreLogin &&
+                        <button
+                          type="button"
+                          onClick={payCash}>
+                          Cash Paid at Store
+                        </button>
+                      }
                     </Link>
                   ))}
             </div>

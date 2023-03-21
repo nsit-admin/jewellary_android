@@ -1,7 +1,9 @@
 import express from 'express';
 
-import { signupExisting, signupNew, login, schemes, payment, isAuth, paymentUpdate,
-    schemesAddition, sendOtp,  verifyOtp, forgotPassword, resendOtp, getRates} from '../controllers/auth.js';
+import {
+    signupExisting, signupNew, login, schemes, payment, isAuth, paymentUpdate,
+    schemesAddition, sendOtp, verifyOtp, forgotPassword, resendOtp, getRates, cashPayment, paymentStatus
+} from '../controllers/auth.js';
 
 const router = express.Router();
 
@@ -30,6 +32,10 @@ router.get('/api/private', isAuth);
 router.get('/api/rates', getRates);
 
 router.get('/api/resendOtp', resendOtp);
+
+router.post('/api/cashPayment', cashPayment);
+
+router.post('/api/paymentStatus', paymentStatus);
 
 router.get('/public', (req, res, next) => {
     res.status(200).json({ message: "here is your public resource" });
