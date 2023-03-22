@@ -2,6 +2,7 @@
   width: 96%;
   margin: 0 auto;
 }
+
 .addScheme .container {
   background-color: #faf8f1;
   border-radius: 10px;
@@ -9,24 +10,28 @@
   margin: 2rem auto 0 auto;
   width: 60%;
 }
+
 .addScheme .container .savingType {
   display: flex;
   gap: 1rem;
   align-items: center;
   justify-content: flex-start;
 }
+
 .addScheme .container form {
   display: flex;
   flex-direction: column;
   gap: .75rem;
   margin: 20px 0;
 }
+
 .addScheme .container form .inputContainer {
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
   justify-content: space-between;
 }
+
 .addScheme .container form input {
   border: none;
   background-color: transparent;
@@ -35,6 +40,7 @@
   padding: 8px;
   /* border-radius: 10px; */
 }
+
 .addScheme .container form select {
   border: none;
   background-color: transparent;
@@ -43,6 +49,7 @@
   padding: 8px;
   flex: 1;
 }
+
 .addScheme .container form button {
   /* width: fit-content; */
   padding: 10px;
@@ -60,10 +67,19 @@
     width: 90%;
     padding: 1rem;
   }
+
   .addScheme .container form .inputContainer {
     flex-direction: column;
   }
+
   .addScheme .container form button {
     margin: 0 auto;
   }
-}/*# sourceMappingURL=AddScheme.css.map */
+}
+
+/*# sourceMappingURL=AddScheme.css.map */
+
+.schemeText {
+  font-size: 10px;
+  color: red;
+}

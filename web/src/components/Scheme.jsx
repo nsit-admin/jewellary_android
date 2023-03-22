@@ -196,7 +196,7 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
                       <button
                         type="button"
                         onClick={payhandler}>
-                        Pay Scheme
+                        Make Payment
                       </button>
                       {isStoreLogin &&
                         <button

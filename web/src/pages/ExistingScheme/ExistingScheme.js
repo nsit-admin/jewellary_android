@@ -94,6 +94,7 @@ const ExistingScheme = () => {
   };
 
   const refresh = () => {
+    getRates();
     storeLogin ? getCustomerSchemes() : getMySchemes();
   };
 

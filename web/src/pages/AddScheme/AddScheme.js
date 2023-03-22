@@ -260,6 +260,20 @@ const AddScheme = () => {
             Cancel
           </button>
         </form>
+        <div className="schemeText">
+            <h4>Bonus Details</h4><br></br>
+            <b>CASH</b><br></br>
+            Free Gift + 1 Month Bonus at the end of 11th month<br></br>
+            <b>GOLD</b><br></br>
+            Free Gift + No MC, No VA (Wastage) on accumulated weight at end of 11th Month <br></br>
+            Terms & Conditions<br></br>
+            Only ONE instalment per month<br></br>
+            Scheme maturity after 11 Month<br></br>
+            No Cash/Coins will be given for Bonus scheme<br></br>
+            ONE instalment will be deducted if discontinued<br></br>
+            No CASH for GOLD scheme<br></br>
+            GST Applicable<br></br>
+          </div>
       </div>
     </div>
   );
