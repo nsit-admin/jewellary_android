@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Scheme.css";
 import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
@@ -30,14 +30,16 @@ const Scheme = ({ item, expandedChitNo, onExpand, isStoreLogin, onComplete }) =>
   const [modalStatus, setModalStatus] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalDesc, setModalDesc] = useState('');
-  const orderId =
-    Math.floor(Math.random() * 10000 + 1) +
-    "_" +
-    item.chits.yrtrno +
-    "_" +
-    item.chits.STCode;
-  item.chits["order_id"] = orderId;
-  let url = `/about?amount=${item.chits.InstAmt}&order=${orderId}`;
+  const [orderId, setOrderId] = useState(null);
+  useEffect(() => {
+    if (!orderId) {
+      setOrderId(Math.floor(Math.random() * 10000 + 1) +  "_" +  item.chits.yrtrno +  "_" +  item.chits.STCode);
+    }
+    item.chits["order_id"] = orderId;
+    console.log(item.chits["order_id"]);
+  }, [orderId, openPayment])
+
+  let url = `/about?amount=${item.chits.InstAmt}&order=${item?.chits?.order_id}`;
   const handleClose = () => {
     setOpenPayment(false);
   };
