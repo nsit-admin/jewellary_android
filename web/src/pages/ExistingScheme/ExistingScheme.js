@@ -16,25 +16,71 @@ const ExistingScheme = () => {
   const [viewChits, setViewChits] = useState(false);
   const [customerPhone, setCustomerPhone] = useState("");
   const [showPayment, setShowPayment] = useState(false);
-  const [todayRate, setTodayRate] = useState('');
+  const [todayRate, setTodayRate] = useState("");
   const [modalStatus, setModalStatus] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
-  const [modalDesc, setModalDesc] = useState('');
-  const [expandedChitNo, setExpandedChitNo] = useState('');
-  const API_URL = 'https://guruhastithangamaaligai.com/api';
-  // const API_URL = 'http://localhost:5000/api';
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalDesc, setModalDesc] = useState("");
+  const [expandedChitNo, setExpandedChitNo] = useState("");
+  // const [timer, setTimer] = useState(120000);
+  const events = [
+    "load",
+    "mousemove",
+    "mousedown",
+    "click",
+    "scroll",
+    "keypress",
+  ];
 
+  const API_URL = "https://guruhastithangamaaligai.com/api";
+  // const API_URL = 'http://localhost:5000/api';
+  let timer;
   useEffect(() => {
     setStoreLogin(location.state.isStoreLogin);
     setMobileNumber(location.state.mobileNumber);
     if (!location.state.isStoreLogin) {
       getMySchemes();
     } else if (location.state.fromAdd) {
-      setCustomerPhone(location.state.mobileNumber)
+      setCustomerPhone(location.state.mobileNumber);
       getCustomerSchemes();
     }
     getRates();
+
+    Object.values(events).forEach((item) => {
+      window.addEventListener(item, () => {
+        resetTimer();
+        handleLogoutTimer();
+      });
+    });
+
+    return () => {
+      Object.values(events).forEach((item) => {
+        window.removeEventListener(item, () => {
+          resetTimer();
+          handleLogoutTimer();
+        });
+      });
+    };
   }, []);
+  const handleLogoutTimer = () => {
+    timer = setTimeout(() => {
+      resetTimer();
+
+      Object.values(events).forEach((item) => {
+        window.removeEventListener(item, resetTimer);
+      });
+
+      logoutAction();
+    }, 120000);
+  };
+
+  const resetTimer = () => {
+    if (timer) clearTimeout(timer);
+  };
+  const logoutAction = () => {
+    localStorage.clear();
+
+    navigate("/");
+  };
 
   const openAddScheme = () => {
     navigate("/add-scheme", {
@@ -49,20 +95,19 @@ const ExistingScheme = () => {
 
   const refresh = () => {
     storeLogin ? getCustomerSchemes() : getMySchemes();
-  }
+  };
 
   const getRates = () => {
     fetch(`${API_URL}/rates`, {
-      method: 'GET',
-    })
-      .then(async res => {
-        const jsonRes = await res.json();
-        setTodayRate(jsonRes?.rates[0]?.GoldRate22.split(".")[0]);
-      })
-  }
+      method: "GET",
+    }).then(async (res) => {
+      const jsonRes = await res.json();
+      setTodayRate(jsonRes?.rates[0]?.GoldRate22.split(".")[0]);
+    });
+  };
 
   const getMySchemes = () => {
-    let moNum = mobileNumber || location.state.mobileNumber
+    let moNum = mobileNumber || location.state.mobileNumber;
     fetch(`${API_URL}/schemes?mobileNumber=${moNum}`, {
       method: "GET",
     })
@@ -102,8 +147,11 @@ const ExistingScheme = () => {
       setModalDesc("Kindly enter customer mobile number");
       return;
     }
-    if ((customerPhone && customerPhone.length != 10) || (location.state?.mobileNumber && location.state?.mobileNumber.length != 10)) {
-
+    if (
+      (customerPhone && customerPhone.length != 10) ||
+      (location.state?.mobileNumber &&
+        location.state?.mobileNumber.length != 10)
+    ) {
       setModalStatus(true);
       setModalTitle("GHT");
       setModalDesc("Kindly enter Valid  mobile number of Customer");
@@ -151,7 +199,9 @@ const ExistingScheme = () => {
         close={() => setModalStatus(false)}></AlertDialogSlide>
       <Header />
 
-      <h4>{'Gold Rate - (22 Carat) - Rs: '} {todayRate}</h4>
+      <h4>
+        {"Gold Rate - (22 Carat) - Rs: "} {todayRate}
+      </h4>
       {storeLogin && (
         <div className="heading">
           <input
@@ -170,8 +220,7 @@ const ExistingScheme = () => {
             {"Get Existing"}
           </button>
         </div>
-      )
-      }
+      )}
       <div className="heading">
         {storeLogin && viewChits && (
           <>
@@ -199,9 +248,13 @@ const ExistingScheme = () => {
             </button>
           </>
         )}
-
-      </div >
-      <button type="button" className="refresh" onClick={refresh}>Refresh</button>
+      </div>
+      <button
+        type="button"
+        className="refresh"
+        onClick={refresh}>
+        Refresh
+      </button>
       {viewChits && (
         <div className="schemeList">
           {myChits?.map((item, index) => (
@@ -210,8 +263,8 @@ const ExistingScheme = () => {
               key={index}
               expandedChitNo={expandedChitNo}
               isStoreLogin={storeLogin}
-              onComplete={(e)=> refresh()}
-              onExpand={(e)=>setExpandedChitNo(e === expandedChitNo ? '' : e)}
+              onComplete={(e) => refresh()}
+              onExpand={(e) => setExpandedChitNo(e === expandedChitNo ? "" : e)}
             />
           ))}
         </div>

@@ -25,6 +25,16 @@ const AddScheme = () => {
   const API_URL = "https://guruhastithangamaaligai.com/api";
   // const API_URL = "http://localhost:5000/api";
 
+  let timer;
+  const events = [
+    "load",
+    "mousemove",
+    "mousedown",
+    "click",
+    "scroll",
+    "keypress",
+  ];
+
   useEffect(() => {
     setStoreLogin(location.state.isStoreLogin);
     setMobileNumber(location.state.mobileNumber);
@@ -38,7 +48,34 @@ const AddScheme = () => {
       setIsEditable(false);
       setIsDefaultsSet(true);
     }
+
+    Object.values(events).forEach((item) => {
+      window.addEventListener(item, () => {
+        resetTimer();
+        handleLogoutTimer();
+      });
+    });
   }, []);
+  const handleLogoutTimer = () => {
+    timer = setTimeout(() => {
+      resetTimer();
+
+      Object.values(events).forEach((item) => {
+        window.removeEventListener(item, resetTimer);
+      });
+
+      logoutAction();
+    }, 120000);
+  };
+
+  const resetTimer = () => {
+    if (timer) clearTimeout(timer);
+  };
+  const logoutAction = () => {
+    localStorage.clear();
+
+    navigate("/");
+  };
 
   const instData = [
     { label: "Plan - 500", value: "500" },
@@ -52,7 +89,11 @@ const AddScheme = () => {
 
   const goBack = () => {
     navigate("/existing-scheme", {
-      state: { mobileNumber: mobileNumber, isStoreLogin: storeLogin, fromAdd: true },
+      state: {
+        mobileNumber: mobileNumber,
+        isStoreLogin: storeLogin,
+        fromAdd: true,
+      },
     });
   };
 
@@ -84,7 +125,11 @@ const AddScheme = () => {
           const jsonRes = await res.json();
           if (res.status === 200) {
             navigate("/existing-scheme", {
-              state: { mobileNumber: mobileNumber, isStoreLogin: storeLogin, fromAdd: true },
+              state: {
+                mobileNumber: mobileNumber,
+                isStoreLogin: storeLogin,
+                fromAdd: true,
+              },
             });
           } else {
             // setMessage(jsonRes.message);
