@@ -6,7 +6,6 @@ import dateformat from "dateformat";
 import Chits from "../models/chits.js";
 import ChitRec from "../models/chitsrec.js";
 import StoreLogin from "../models/store_login.js";
-4;
 import CustMaster from "../models/custmast.js";
 import OTP from "../models/otp.js";
 import sequelize from "../utils/database.js";
@@ -228,7 +227,7 @@ const paymentUpdate = (req, res, next) => {
         bank_ref_no: req.body.bank_ref_no,
         order_status: req.body.order_status,
         payment_mode: req.body.payment_mode,
-        status_message: req.body.tracking_id,
+        status_message: req.body.status_message,
         amount: req.body.amount,
         trans_date: req.body.trans_date,
         updated_date: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
@@ -791,6 +790,127 @@ const paymentStatus = (req, res, next) => {
     });
 };
 
+
+const paymentBatch = (req, res, next) => {
+  // console.log(req)
+  payment_details
+    .update(
+      {
+        tracking_id: req.body.tracking_id,
+        bank_ref_no: req.body.bank_ref_no,
+        order_status: req.body.order_status,
+        payment_mode: req.body.payment_mode,
+        status_message: req.body.status_message,
+        amount: req.body.amount,
+        trans_date: req.body.trans_date,
+        updated_date: dateformat(new Date(), "yyyy-mm-dd h:MM:ss"),
+      },
+      {
+        where: {
+          order_id: req.body.order_id,
+        },
+        returning: true,
+        plain: true,
+      }
+    )
+    .then((up) => {
+      if (req.body.order_status == "Success") {
+        payment_details
+          .findOne({
+            order_id: req.body.order_id,
+          })
+          .then((e) => {
+            const chtPy = e.toJSON();
+            sequelize
+              .query(
+                `SELECT * FROM payment_details pay, chits cts
+            where pay.order_id = '${req.body.order_id}' and cts.TrNo = pay.customer_chit_no`
+              )
+              .then((rec) => {
+                const vl = rec[0][0];
+                Chits.update(
+                  {
+                    InstPaid: parseInt(vl.InstPaid) + 1,
+                  },
+                  {
+                    where: {
+                      MobileNo: vl.MobileNo,
+                      TrNo: vl.TrNo,
+                    },
+                  }
+                ).then((d) => {
+                  sequelize
+                    .query(
+                      `SELECT * FROM chits c, payment_details p 
+                        where c.YrTrNo = p.customer_chit_no
+                        and p.order_id = '${req.body.order_id}'`
+                    )
+                    .then((dd) => {
+                      const chitt = dd[0][0];
+                      sequelize
+                        .query("SELECT max(trno) pkey from chitrec")
+                        .then((val) => {
+                          let weight = "0.000";
+                          rates.findAll({
+                            limit: 1,
+                            order: [[sequelize.col('DateTime'), 'DESC']],
+                          })
+                            .then((va) => {
+                              const rate = va[0];
+                              if (chitt.STCode == 1) {
+                                weight =
+                                  Number(chitt.InstAmt) / Number(rate.GoldRate22);
+                              }
+                              const pk = val[0][0].pkey;
+                              ChitRec.create({
+                                trno: parseInt(pk) + 1,
+                                yrtrno: chitt.YrTrNo,
+                                chitno: chitt.TrNo,
+                                trdate: dateformat(
+                                  new Date(),
+                                  "yyyy-mm-dd h:MM:ss"
+                                ),
+                                instno: parseInt(vl.InstPaid) + 1,
+                                instamt: chitt.InstAmt,
+                                remarks: 'ONLINE PAYMENT',
+                                rate: rate.GoldRate22, // TODO - GEt it from other table during insertion
+                                wt: weight, // TODO - Calculation to be done
+                                DateStamp: dateformat(
+                                  new Date(),
+                                  "yyyy-mm-dd h:MM:ss"
+                                ),
+                              })
+                                .then((ins) => {
+                                  sendPaymentSuccess(chitt.MobileNo);
+                                  return res.status(200).json({
+                                    message: `payment completed for the chitNo - ${chitt.yrtrno
+                                      }, your receipt number is ${parseInt(pk) + 1
+                                      }`,
+                                  });
+                                })
+                                .catch((err) => {
+                                  console.log(err);
+                                  return res.status(500).json({
+                                    message: `Unexpected error occured, please try again later`,
+                                  });
+                                });
+                            });
+
+                          // }
+                        });
+                    });
+                });
+              });
+          })
+          .catch((err) => {
+            console.log("error", err);
+          });
+      }
+    })
+    .catch((err) => {
+      console.log("error", err);
+    });
+};
 
 
 export {

@@ -2,9 +2,9 @@ var http = require('http'),
     fs = require('fs'),
     ccav = require('./ccavutil.js'),
     crypto = require('crypto'),
+    axios = require('axios'),
     qs = require('querystring');
 
-exports.checkStatus = function(request,response){
     // console.log(request);
     var body = '',
     workingKey = '1FE7DE0F4A952B12713FE5D7B97BE1C4',		//Put in the 32-Bit key shared by CCAvenues.
@@ -12,13 +12,14 @@ exports.checkStatus = function(request,response){
 	encRequest = '',
 	formbody = '';
 
-    //Generate Md5 hash for the key and then convert in base64 string
-    var md5 = crypto.createHash('md5').update(workingKey).digest();
-    var keyBase64 = Buffer.from(md5).toString('base64');
+    // //Generate Md5 hash for the key and then convert in base64 string
+    // var md5 = crypto.createHash('md5').update(workingKey).digest();
+    // var keyBase64 = Buffer.from(md5).toString('base64');
 
-    //Initializing Vector and then convert in base64 string
-    var ivBase64 = Buffer.from([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,0x0e, 0x0f]).toString('base64');
+    // //Initializing Vector and then convert in base64 string
+    // var ivBase64 = Buffer.from([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,0x0e, 0x0f]).toString('base64');
 
+    
 
     request.on('data', function (data) {
         body += data;
@@ -33,5 +34,10 @@ exports.checkStatus = function(request,response){
 	response.write(formbody);
 	response.end();
     });
-   return; 
-};
+
+
+   axios({
+    method: 'post',
+    url: 'https://api.ccavenue.com/apis/servlet/DoWebTrans',
+    data: ccavResponse
+  });
